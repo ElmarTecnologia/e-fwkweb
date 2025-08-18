@@ -1,0 +1,33 @@
+﻿@model ELMAR.DevHtmlHelper.Models.PerfilAutorizacao
+
+@if (!string.IsNullOrEmpty(ViewBag.Alert))
+{
+    <span style="padding:10px;color:blue"><b>@ViewBag.Alert</b></span>
+    @Html.ValidationSummary(false)
+}
+else
+{
+    <h4>Cadastro de Autorização/Perfil</h4>
+    using (Html.BeginForm("SalvarPerfilAutoriza", "Fwk"))
+    {
+        @*Html.Hidden("isPartial", ViewData["isPartial"])*@
+        @Html.Hidden("RedirectTo", (string)ViewBag.RedirectTo)
+        <!--<input type="hidden" id="CRUDAction" name="CRUDAction" />-->
+
+        <p>Perfil:</p>
+        <p>@Html.TextBoxFor(model => model.AutPerfil, new { id = "inputPerfil" })  <br />@Html.ValidationMessageFor(model => model.AutPerfil)  </p>
+
+        <p>Chamada:</p>
+        <p>@Html.TextBoxFor(model => model.AutChamada, new { id = "inputChamada" })  <br />@Html.ValidationMessageFor(model => model.AutChamada)  </p>
+
+        <p>Ativo:</p>
+        <p>
+            @Html.RadioButtonFor(model => model.PerAutAtivo, true)
+            @Html.Label("rbAutorizarS", "Sim")
+            @Html.RadioButtonFor(model => model.PerAutAtivo, false)
+            @Html.Label("rbAutorizarN", "Não")
+            <br />@Html.ValidationMessageFor(model => model.PerAutAtivo)
+        </p>
+        <!--<input type="submit" value="CONFIRMAR EXCLUSÃO" onclick="$('#CRUDAction').val(this.value)" title="CONFIRMAR" />-->
+    }
+}

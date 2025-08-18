@@ -1,0 +1,1368 @@
+﻿@{
+    List<string> ColunasOcultas = new List<string>();
+    List<string> Totalizadores = new List<string>();
+    List<string> TotalizadoresGrp = new List<string>();
+    List<string> ColunasDateTime = new List<string>();
+    List<string> ColunasCurrency = new List<string>();
+    List<string> ColunasImage = new List<string>();
+    List<string> ColunasHtml = new List<string>();
+    List<string> Agrupadores = new List<string>();
+    List<string> CustomAgrupadores = new List<string>();
+    List<string> ColunasActions = new List<string>();
+    Dictionary<string, List<string>> DicColunasActions = new Dictionary<string, List<string>>();
+    List<string> ColunasLinks = new List<string>();
+    Dictionary<string, List<string>> DicColunasLinks = new Dictionary<string, List<string>>();
+    var modulo = System.Text.RegularExpressions.Regex.Replace(ViewData["gridName"].ToString(), "([0-9])", "");
+    var microDataActive = ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps.ContainsKey(modulo);
+    List<string> CRUDActions = new List<string>();
+    int controlWidth = 0;
+    //Tratamento para a unidade das dimensões do painel
+    System.Web.UI.WebControls.Unit Altura = 0;
+    System.Web.UI.WebControls.Unit Largura = 0;
+    //Variáveis para validação de autorização
+    ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = new ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao();
+    bool IsMobileDevice = ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request);
+    string pathApp = ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session);
+    string pathAppSubdir = ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathAppSubdir", Session);
+    bool Enabled = true;
+
+    string CTX = string.Empty;
+    CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX(HttpContext.Current, CTX, "CTX", true);
+    CTX = string.IsNullOrEmpty(CTX) && ViewData["CTX"] != null ? (string)ViewData["CTX"] : CTX;
+
+    bool activateAdaptative = ((Model is System.Data.DataView) && (((System.Data.DataView)Model).ToTable().Columns.Count - ColunasOcultas.Count > 3 || IsMobileDevice) && (bool)ViewBag.adaptativeMode);
+
+    if (ViewData["Altura"].ToString().Contains("%"))
+    {
+        Altura = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewData["Altura"].ToString().Replace("%", "")));
+    }
+    else
+    {
+        Altura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewData["Altura"].ToString().Replace("px", "")));
+    }
+    if (ViewData["Largura"].ToString().Contains("%"))
+    {
+        Largura = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewData["Largura"].ToString().Replace("%", "")));
+    }
+    else
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewData["Largura"].ToString().Replace("px", "")));
+    }
+    if (ViewData["ColunasOcultas"] != null && !string.IsNullOrEmpty(ViewData["ColunasOcultas"].ToString()))
+    {
+        ColunasOcultas = ViewData["ColunasOcultas"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["Totalizadores"] != null && !string.IsNullOrEmpty(ViewData["Totalizadores"].ToString()))
+    {
+        Totalizadores = ViewData["Totalizadores"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["TotalizadoresGrp"] != null && !string.IsNullOrEmpty(ViewData["TotalizadoresGrp"].ToString()))
+    {
+        TotalizadoresGrp = ViewData["TotalizadoresGrp"].ToString().Split(';').ToList<string>();
+    }
+    Totalizadores.AddRange(TotalizadoresGrp); //Adiciona os Totalizadores de Grupos aos Totalizadores Gerais
+    if (ViewData["ColunasDateTime"] != null && !string.IsNullOrEmpty(ViewData["ColunasDateTime"].ToString()))
+    {
+        ColunasDateTime = ViewData["ColunasDateTime"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["ColunasCurrency"] != null && !string.IsNullOrEmpty(ViewData["ColunasCurrency"].ToString()))
+    {
+        ColunasCurrency = ViewData["ColunasCurrency"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["ColunasImage"] != null && !string.IsNullOrEmpty(ViewData["ColunasImage"].ToString()))
+    {
+        ColunasImage = ViewData["ColunasImage"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["ColunasHtml"] != null && !string.IsNullOrEmpty(ViewData["ColunasHtml"].ToString()))
+    {
+        ColunasHtml = ViewData["ColunasHtml"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["Agrupadores"] != null && !string.IsNullOrEmpty(ViewData["Agrupadores"].ToString()))
+    {
+        Agrupadores = ViewData["Agrupadores"].ToString().Split(';').ToList<string>();
+    }
+    if (ViewData["CustomAgrupadores"] != null && !string.IsNullOrEmpty(ViewData["CustomAgrupadores"].ToString()))
+    {
+        CustomAgrupadores = ViewData["CustomAgrupadores"].ToString().Split(';').ToList<string>();
+    }
+    //Utilização do método 'GetColParametro' do Model
+    ELMAR.DevHtmlHelper.Models.ReportModel gridModel = new ELMAR.DevHtmlHelper.Models.ReportModel();
+    if (ViewData["InfoColunas"] != null && !string.IsNullOrEmpty(ViewData["InfoColunas"].ToString()))
+    {
+        gridModel.InfoColunas = ViewData["InfoColunas"].ToString();
+    }
+    if (ViewData["ColunasActions"] != null && !string.IsNullOrEmpty(ViewData["ColunasActions"].ToString()))
+    {
+        ColunasActions = ViewData["ColunasActions"].ToString().Split(';').ToList<string>();
+        //Adiciona as colunas dinamicamente, caso não existam
+        if (ColunasActions.Count > 0)
+        {
+            foreach (var item in ColunasActions)
+            {
+                string[] ColunasActionParams = item.Split('|');
+
+                //Verifica autorização colunas actions (/Controller/Action)
+                if (ColunasActionParams.Length >= 6 && (!ColunasActionParams[1].StartsWith("http") && !ColunasActionParams[1].StartsWith("~")))
+                {
+                    Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ColunasActionParams[2] + "/" + ColunasActionParams[1], HttpContext.Current, string.Empty);
+                }
+
+                //Popula o dicionário das ColunasActions
+                if (Enabled)
+                {
+                    if (!DicColunasActions.ContainsKey(ColunasActionParams[0]))
+                    {
+                        DicColunasActions.Add(ColunasActionParams[0], new List<string>() { item });
+                    }
+                    else
+                    {
+                        DicColunasActions[ColunasActionParams[0]].Add(item);
+                    }
+                }
+
+                if (Model is System.Data.DataView && !string.IsNullOrEmpty(ColunasActionParams[0]) && !((System.Data.DataView)Model).Table.Columns.Contains(ColunasActionParams[0]))
+                {
+                    ((System.Data.DataView)Model).Table.Columns.Add(ColunasActionParams[0]);
+                    //Popula com o valor padrão para a coluna, caso o valor dessa seja dinâmico, indicado pela tag 'http'
+                    if (!ColunasActionParams[1].ToLower().Equals("http"))
+                    {
+                        for (int i = 0; i < ((System.Data.DataView)Model).Table.Rows.Count; i++)
+                        {
+                            ((System.Data.DataView)Model).Table.Rows[i][ColunasActionParams[0]] = ColunasActionParams[0];
+                        }
+                    }
+                }
+            }
+        }
+    } //ColunasActions
+    if (ViewData["ColunasLinks"] != null && !string.IsNullOrEmpty(ViewData["ColunasLinks"].ToString()))
+    {
+        ColunasLinks = ViewData["ColunasLinks"].ToString().Split(';').ToList<string>();
+        foreach (var item in ColunasLinks)
+        {
+            string[] ColunasLinksParams = item.Split('|');
+            //Popula o dicionário das ColunasLinks
+            if (!DicColunasLinks.ContainsKey(ColunasLinksParams[0]))
+            {
+                DicColunasLinks.Add(ColunasLinksParams[0], new List<string>() { item });
+            }
+            else
+            {
+                DicColunasLinks[ColunasLinksParams[0]].Add(item);
+            }
+        }
+    }
+    if (ViewData["CRUDActions"] != null && !string.IsNullOrEmpty(ViewData["CRUDActions"].ToString()))
+    {
+        CRUDActions = ViewData["CRUDActions"].ToString().Split('|').ToList<string>();
+    } //CRUDActions
+
+    bool isEmpty = !(Model is System.Data.DataView && ((System.Data.DataView)Model).Table.Rows.Count > 0);
+    bool hideDetails = false;
+
+    //Insert a blank row to enable microdata tags
+    if (isEmpty && Model != null && Model is System.Data.DataView)
+    {
+        System.Data.DataRow newBlankRow1 = ((System.Data.DataView)Model).Table.NewRow();
+        ((System.Data.DataView)Model).Table.Rows.InsertAt(newBlankRow1, 0);
+        hideDetails = true;
+    }
+
+    @functions
+    {
+        bool IsAllSelectedGridView(ASPxGridView gridView)
+        {
+            for (var i = 0; i < gridView.VisibleRowCount; i++)
+            {
+                if ((!gridView.IsGroupRow(i)) & (!gridView.Selection.IsRowSelected(i)))
+                    return false;
+            }
+            return true;
+        }
+    }
+}
+@if (CustomAgrupadores.Count > 0 && ViewData["isCallBack"] == null && !isEmpty)
+{
+<div style="width:100%;float:left;" id="groupExpandCollapse1">
+    @Html.DevExpress().ComboBox(settings => {
+    settings.Name = "GroupBy_" + ViewData["gridName"].ToString();
+    settings.Theme = ViewData["Tema"].ToString();
+    settings.Width = System.Web.UI.WebControls.Unit.Pixel(310);
+    settings.Style.Add("margin-top", "60px");
+    settings.Style.Add("display", "block");
+    int index = 0;
+    settings.Properties.Items.Add("Visualizar por:", null);
+    foreach (var item in CustomAgrupadores)
+    {
+        //Adicionando agrupadores
+        string value = item.Split('|')[0];
+        string desc = item.Split('|').Length > 1 ? item.Split('|')[1] : value;
+        if(!string.IsNullOrEmpty(desc))
+            settings.Properties.Items.Add(desc, (string)value);
+        index++;
+    }
+    //settings.ControlStyle.CssClass = "gridViewGroupBy";
+    string currentGroups = ViewData["Agrupadores"].ToString().EndsWith(";") ? ViewData["Agrupadores"].ToString() : ViewData["Agrupadores"].ToString() + ";";
+    settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s) { var coluna = s.GetValue(); " + ViewData["gridName"].ToString() + ".PerformCallback({ 'Agrupadores': \'" + currentGroups + ";'+coluna+'" + "' }); groupedColumns = \'" + currentGroups + ";'+coluna+'" + ";'; " +
+                "$('html, body').animate({scrollTop: $(\"#" + ViewData["gridName"].ToString() + "\").offset().top-200}, 1000); }";
+}).GetHtml()
+</div>
+}
+
+@if ((Agrupadores.Count > 0 || CustomAgrupadores.Count > 0) && ViewData["isCallBack"] == null && !isEmpty && (bool)ViewData["ExibeAgrupador"])
+{
+    <div style="width:100%;float:left;" id="groupExpandCollapse">
+        @Html.DevExpress().Button(s => {
+            s.Name = "ButtonCollapse_"+ ViewData["gridName"].ToString();
+            s.Text = "Recolher Todos";
+            s.Width = System.Web.UI.WebControls.Unit.Pixel(155);
+            s.Theme = ViewData["Tema"].ToString();
+            s.UseSubmitBehavior = false;
+            s.Style.Add("margin-top", "15px");
+            s.Style.Add("float", "left");
+            s.ClientSideEvents.Click = "function() { " + ViewData["gridName"].ToString() + ".CollapseAll() }";
+        }).GetHtml()
+        &nbsp;
+        @Html.DevExpress().Button(s => {
+            s.Name = "ButtonExpand_" + ViewData["gridName"].ToString();
+            s.Text = "Expandir Todos";
+            s.Width = System.Web.UI.WebControls.Unit.Pixel(155);
+            s.Theme = ViewData["Tema"].ToString();
+            s.UseSubmitBehavior = false;
+            s.Style.Add("margin-top", "15px");
+            s.Style.Add("float", "left");
+            s.ClientSideEvents.Click = "function() { " + ViewData["gridName"].ToString() + ".ExpandAll() }";
+        }).GetHtml()
+    </div>
+}
+
+@if ((ViewData["ExibeExportador"] != null && (bool)ViewData["ExibeExportador"]) && (ViewData["isCallBack"] == null || !(bool)ViewData["isCallBack"]) && (((string)ViewData["ExportadorPosicao"]).Equals("Topo") || ((string)ViewData["ExportadorPosicao"]).Equals("Ambos")) && !isEmpty)
+{
+    @Html.Partial("DevHelper/_GridViewExporterPartial")
+}
+
+@if (ColunasActions.Count > 0 && (ViewData["isCallBack"] == null || !(bool)ViewData["isCallBack"]) && !isEmpty)
+{
+    <a id="_mainpopup_@{@ViewBag.gridName;}" name="_mainpopup_@{@ViewBag.gridName;}" href="#"></a>
+    @Html.Partial("DevHelper/_MainPopupControl", (string)ViewBag.gridName)
+}
+
+@if (Model != null && Model is System.Data.DataView)
+{
+    @Html.DevExpress().GridView(settings =>
+{
+    settings.SettingsExport.EnableClientSideExportAPI = true;
+    settings.SettingsExport.ExcelExportMode = DevExpress.Export.ExportType.DataAware;
+    settings.SettingsAdaptivity.AdaptivityMode = DevExpress.Web.GridViewAdaptivityMode.HideDataCellsWindowLimit;
+    settings.EditFormLayoutProperties.SettingsAdaptivity.AdaptivityMode = FormLayoutAdaptivityMode.SingleColumnWindowLimit;
+    settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = true;
+    //TODO: Add adaptative mode parameter
+    settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = activateAdaptative ? 3000 : 800;
+    settings.SettingsAdaptivity.AdaptiveDetailColumnCount = IsMobileDevice ? 1 : 1;
+    settings.CommandColumn.Visible = true;
+    settings.SettingsCommandButton.ShowAdaptiveDetailButton.Image.Url = pathApp + "/Content/DevHelper/Images/" + "IconLupaDetalhar.png";
+    settings.SettingsResizing.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Name = ViewData["gridName"].ToString();
+    settings.KeyFieldName = (string)ViewData["gridKey"];
+    settings.Attributes["itemscope itemtype"] = ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps.ContainsKey(modulo) && ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo].ContainsKey(modulo) ?
+                                               ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo][modulo] : string.Empty;
+    string sqlCode = ViewData["sqlCode"].ToString();
+    sqlCode = sqlCode.Replace("'", @"\'");
+    ViewData["CTX"] = CTX;
+    int CommandColumnWidth = 30;
+
+    settings.ClientSideEvents.BeginCallback = "function(s, e){ " +
+        "e.customArgs['CTX'] = '" + CTX + "'; e.customArgs['sqlCode'] = '" + sqlCode + "'; e.customArgs['bdConnection'] = '" + ViewData["bdConnection"].ToString() + "'; e.customArgs['selectedIDs'] = selectedIDs; }";
+
+    settings.HtmlDataCellPrepared = (s, e) =>
+    {
+        e.Cell.Attributes.Add("itemprop", ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps.ContainsKey(modulo) && ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo].ContainsKey(e.DataColumn.EditFormCaption) ?
+                                          ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo][e.DataColumn.EditFormCaption] : string.Empty);
+        string cellValue = e.CellValue.ToString();
+        cellValue = cellValue.Contains(">") ? cellValue.Substring(cellValue.IndexOf('>') + 1, cellValue.LastIndexOf('<') - (cellValue.IndexOf('>') + 1)) : cellValue;
+        e.Cell.Attributes["itemprop"] = e.Cell.Attributes["itemprop"] == "" && ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps.ContainsKey(modulo) && ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo].ContainsKey(cellValue) ?
+                                          ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo][cellValue] : e.Cell.Attributes["itemprop"];
+    };
+
+    if (ViewData["SelectRowMode"].Equals("Multi"))
+    {
+        CommandColumnWidth += 30;
+        //settings.CommandColumn.Visible = true;
+        settings.CommandColumn.AdaptivePriority = 1;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.ShowClearFilterButton = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.AllPages;
+        settings.ClientSideEvents.SelectionChanged = "function(s, e){ gridKey = '" + settings.KeyFieldName + "'; appSubDir = '" + pathAppSubdir + "'; s.GetSelectedFieldValues('" + settings.KeyFieldName + "', GetSelectedFieldValuesCallback); }";
+    }
+
+    settings.CustomJSProperties = (sender, e) =>
+    {
+        e.Properties.Add("cpGroupedRows", "{\"data\":[");
+        e.Properties.Add("cpFilters", "");
+        MVCxGridView grid = (MVCxGridView)sender;
+        foreach (GridViewDataColumn col in grid.GetGroupedColumns())
+        {
+            if (col.GroupIndex != 0)
+            {
+                e.Properties["cpGroupedRows"] += ", ";
+            }
+            e.Properties["cpGroupedRows"] += "{\"name\":\"" + col.FieldName + "\", \"index\":\"" + col.GroupIndex + "\",\"displayName\":\"" + col.EditFormCaption + "\"}";
+        }
+        e.Properties["cpFilters"] = grid.FilterExpression;
+        e.Properties["cpGroupedRows"] += "]}";
+        e.Properties["cpVisibleRowCount"] = grid.VisibleRowCount;
+        //e.Properties["cpFilteredRowCountWithoutPage"] = GetFilteredRowCountWithoutPage(grid);
+    };
+
+    settings.ClientSideEvents.EndCallback = "function(s, e) { OnColumnGrouping(s, e); if(typeof groupedColumns == \"undefined\"){ e.customArgs['Agrupadores'] = groupedColumns; } }";
+    //settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+
+    //Salva o DataSource / DataView na Sessao (Utilizado para os CallBacks)
+
+    TempData["SessionModel" + settings.Name + CTX] = Model;
+    Session["SessionModel" + settings.Name + CTX] = Model;
+    TempData["SessionSqlCode" + settings.Name + CTX] = sqlCode;
+
+    TempData["ViewData" + settings.Name + CTX] = ViewData;
+    //ELMAR.DevHtmlHelper.Models.Core.GetSetLocalStorage("ViewData" + settings.Name + CTX, (System.Web.Mvc.ViewDataDictionary)ViewData);
+
+    if (ViewData["gridTitulo"] != null && ViewData["gridTitulo"].ToString() != "")
+    {
+        settings.SettingsText.Title = "<h3>" + ViewData["gridTitulo"].ToString() + "</h3>";
+    }
+
+    if (ViewData["Info"] != null && ViewData["Info"].ToString() != "")
+    {
+        string infoValue = ViewData["Info"].ToString().Replace("\n", "<br />");
+        string[] infoTag = infoValue.Split('|');
+        int cont = 0;
+        string captionStr = "";
+        string titleStr = "";
+        foreach (var item in infoTag)
+        {
+            if (string.IsNullOrEmpty(item))
+                continue;
+            if (cont == 0)
+            {
+                titleStr += "<h3 class=\"subTitulo\" style=\"float:left;margin-left:10px;text-align:left;\">" + item + "</h3>";
+            }
+            else
+            {
+                captionStr += "<span class=\"subTitulo\" style=\"float:left;margin-left:10px;text-align:left;\">" + item + "</span>";
+            }
+            cont++;
+        }
+        settings.Caption += titleStr + captionStr;
+    }
+
+    //Callback Default Route
+    settings.CallbackRouteValues = new
+    {
+        CallbackRoute = "Default",
+        Controller = (string)ViewData["Controller"],
+        Action = (string)ViewData["Action"],
+        dtSource = Model,
+        //sqlCode = (string)ViewData["sqlCode"],
+        isCallBack = true,
+        gridName = (string)settings.Name,
+        gridTitulo = (string)ViewData["gridTitulo"],
+        gridKey = (string)ViewData["gridKey"],
+        tamPagina = (int)ViewData["gridTamPagina"],
+        Tema = (string)ViewData["Tema"],
+        refreshData = (bool)ViewData["refreshData"],
+        DetailAction = (string)ViewData["DetailAction"],
+        Filtros = (string)ViewData["Filtros"],
+        Agrupadores = (string)ViewData["Agrupadores"],
+        Totalizadores = (string)ViewData["Totalizadores"],
+        TotalizadoresGrp = (string)ViewData["TotalizadoresGrp"],
+        ColunasOcultas = (string)ViewData["ColunasOcultas"],
+        ColunasLinks = (string)ViewData["ColunasLinks"],
+        ColunasActions = (string)ViewData["ColunasActions"],
+        ColunasDateTime = (string)ViewData["ColunasDateTime"],
+        ColunasCurrency = (string)ViewData["ColunasCurrency"],
+        ColunasImage = (string)ViewData["ColunasImage"],
+        ColunasHtml = (string)ViewData["ColunasHtml"],
+        CRUDActions = (string)ViewData["CRUDActions"],
+        ExibeLinhaFiltro = (bool)ViewData["ExibeLinhaFiltro"],
+        PersonalizarFiltro = (bool)ViewData["PersonalizarFiltro"],
+        ExibeExportador = (bool)ViewData["ExibeExportador"],
+        ExportadorPosicao = (string)ViewData["ExportadorPosicao"],
+        ExibeAgrupador = (bool)ViewData["ExibeAgrupador"],
+        Info = (string)ViewData["Info"],
+        Altura = (string)ViewData["Altura"],
+        Largura = (string)ViewData["Largura"],
+        ExportHeaderText = (string)ViewData["ExportHeaderText"],
+        bdConnection = (string)ViewData["bdConnection"],
+        Expanded = (bool)ViewData["Expanded"],
+        SelectRowMode = ViewData["SelectRowMode"], //(bool)ViewData["ShowSelectCheckbox"],
+        autoScroll = (bool)ViewData["autoScroll"],
+        showFooter = (bool)ViewBag.showFooter,
+        adaptativeMode = (bool)ViewBag.adaptativeMode,
+        CTX,
+        Tab = ViewBag.Tab
+    };
+
+    //Callback Custom Route
+    settings.CustomActionRouteValues = new
+    {
+        CallbackRoute = "Custom",
+        Controller = (string)ViewData["Controller"],
+        Action = (string)ViewData["Action"],
+        isCallBack = true,
+        Agrupadores = ViewData["Agrupadores"],
+        dtSource = Model,
+        gridName = (string)settings.Name,
+        gridTitulo = (string)ViewData["gridTitulo"],
+        gridKey = (string)ViewData["gridKey"],
+        tamPagina = (int)ViewData["gridTamPagina"],
+        Tema = (string)ViewData["Tema"],
+        refreshData = (bool)ViewData["refreshData"],
+        DetailAction = (string)ViewData["DetailAction"],
+        Filtros = (string)ViewData["Filtros"],
+        Totalizadores = (string)ViewData["Totalizadores"],
+        TotalizadoresGrp = (string)ViewData["TotalizadoresGrp"],
+        ColunasOcultas = (string)ViewData["ColunasOcultas"],
+        ColunasLinks = (string)ViewData["ColunasLinks"],
+        ColunasActions = (string)ViewData["ColunasActions"],
+        ColunasDateTime = (string)ViewData["ColunasDateTime"],
+        ColunasCurrency = (string)ViewData["ColunasCurrency"],
+        ColunasImage = (string)ViewData["ColunasImage"],
+        ColunasHtml = (string)ViewData["ColunasHtml"],
+        CRUDActions = (string)ViewData["CRUDActions"],
+        ExibeLinhaFiltro = (bool)ViewData["ExibeLinhaFiltro"],
+        PersonalizarFiltro = (bool)ViewData["PersonalizarFiltro"],
+        ExibeExportador = (bool)ViewData["ExibeExportador"],
+        ExportadorPosicao = (string)ViewData["ExportadorPosicao"],
+        ExibeAgrupador = (bool)ViewData["ExibeAgrupador"],
+        Info = (string)ViewData["Info"],
+        Altura = (string)ViewData["Altura"],
+        Largura = (string)ViewData["Largura"],
+        ExportHeaderText = (string)ViewData["ExportHeaderText"],
+        bdConnection = (string)ViewData["bdConnection"],
+        Expanded = (bool)ViewData["Expanded"],
+        SelectRowMode = ViewData["SelectRowMode"],
+        autoScroll = (bool)ViewData["autoScroll"],
+        customGrouping = true,
+        showFooter = (bool)ViewBag.showFooter,
+        adaptativeMode = (bool)ViewBag.adaptativeMode,
+        CTX,
+        Tab = ViewBag.Tab
+    };
+
+    //Aplica formatações em tempo de execução
+    //Agrupadores
+    settings.BeforeGetCallbackResult = (sender, e) =>
+    {
+        if (Agrupadores.Count == 0 || isEmpty)
+            return;
+        MVCxGridView grid = (MVCxGridView)sender;
+        if (ViewData["customGrouping"] != null && (bool)ViewData["customGrouping"])
+        {
+            grid.ClearSort();
+            TempData["ViewData" + settings.Name + CTX] = ViewData;
+            foreach (string name in Agrupadores)
+            {
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                string[] groupInfo = name.Split('|');
+                string order = groupInfo.Length > 1 ? groupInfo[1] : "";
+                if (grid != null && grid.Columns[groupInfo[0]] != null)
+                {
+                    grid.GroupBy(grid.Columns[groupInfo[0]]);
+                    if (!string.IsNullOrEmpty(order))
+                    {
+                        grid.SortBy(grid.Columns[groupInfo[0]], DevExpress.Data.ColumnSortOrder.Descending);
+                        //grid.GroupSummarySortInfo.Add(new ASPxGroupSummarySortInfo() { GroupColumn = groupInfo[0], SortOrder = DevExpress.Data.ColumnSortOrder.Descending });
+                    }
+                }
+            }
+        }
+    };
+
+    #region Coluna responsável por expandir os detalhes da linha
+    if (ViewData["DetailAction"] != null && !string.IsNullOrEmpty(ViewData["DetailAction"].ToString()) && !hideDetails)
+    {
+        settings.ClientSideEvents.CustomButtonClick = "function(s, e){ gridView_ExpandClick(s, e); }";
+        settings.CommandColumn.Visible = true;
+        CommandColumnWidth += 30;
+        GridViewCommandColumnCustomButton customButton = new GridViewCommandColumnCustomButton()
+        {
+            ID = "btnExpand",
+            Text = " "
+        };
+        customButton.Image.Url = pathApp + "/Content/DevHelper/Images/" + "IconLupaDetalhar.png";
+        customButton.Image.Width = System.Web.UI.WebControls.Unit.Pixel(23);
+        customButton.Image.ToolTip = "Detalhar";
+        customButton.Styles.Style.CssClass = "tm-execute";
+        settings.CommandColumn.Caption = "Detalhar";
+        settings.CommandColumn.CustomButtons.Add(customButton);
+        settings.SettingsDetail.AllowOnlyOneMasterRowExpanded = true;
+        settings.SettingsDetail.ShowDetailRow = true;
+        settings.SettingsDetail.ShowDetailButtons = true;
+
+        string[] ActionController = ViewData["DetailAction"].ToString().Split('|');
+        if (ActionController.Length >= 2)
+        {
+            settings.SetDetailRowTemplateContent(c =>
+            {
+                //c.Grid.BackgroundImage.ImageUrl = "ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session) + "/Content/DevHelper/Images/" + "IconLupa.png";
+                RouteValueDictionary parametros = new RouteValueDictionary();
+                //Definindo os parâmetros
+                if (ActionController.Length > 2)
+                {
+                    for (int i = 2; i < ActionController.Length; i++)
+                    {
+                        parametros.Add(ActionController[i], DataBinder.Eval(c.DataItem, ActionController[i]).ToString());
+                    }
+                }
+                ViewContext.Writer.Write(
+                    "<a id=\"detailAction" + c.ItemIndex + "\" href=\"#\"></a>" +
+                    Html.Action(ActionController[0], ActionController[1], parametros)
+                );
+            });
+        }
+        else
+        {
+            settings.SetDetailRowTemplateContent(c =>
+            {
+                //c.Grid.BackgroundImage.ImageUrl = "ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session) + "/Content/DevHelper/Images/" + "IconLupa.png";
+                ViewContext.Writer.Write(
+                        "<a id=\"detailAction" + c.ItemIndex + "\" href=\"#\"></a>" +
+                        Html.Partial(ActionController[0])
+                    );
+            });
+        }
+    }
+    #endregion
+
+    #region Coluna responsável pelas ações CRUD
+    if (CRUDActions.Count >= 1)
+    {
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = CRUDActions[0], Action = CRUDActions[1], CRUDAction = "SALVAR" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = CRUDActions[0], Action = CRUDActions[2], CRUDAction = "SALVAR" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = CRUDActions[0], Action = CRUDActions[3], CRUDAction = "DELETE", RedirectTo = HttpContext.Current.Request.Url.AbsoluteUri /*ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+HttpContext.Current.Request.RawUrl*/ };
+        settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
+        //Adicionando confirmação da exclusão
+        settings.SettingsBehavior.ConfirmDelete = true;
+        settings.SettingsText.ConfirmDelete = "Confirmar a exclusão?";
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + CRUDActions[0] + "/" + CRUDActions[1], HttpContext.Current, string.Empty);
+        settings.CommandColumn.ShowNewButton = !string.IsNullOrEmpty(CRUDActions[1]) && Enabled;
+        settings.SettingsCommandButton.NewButton.RenderMode = GridCommandButtonRenderMode.Image;
+        settings.SettingsCommandButton.NewButton.Image.Url = pathApp + "/Content/DevHelper/Images/" + "IconAdd_32x32.png";
+        settings.SettingsCommandButton.NewButton.Image.Height = settings.SettingsCommandButton.EditButton.Image.Width = System.Web.UI.WebControls.Unit.Pixel(25);
+        settings.SettingsCommandButton.NewButton.Image.ToolTip = "NOVO";
+        settings.CommandColumn.ShowNewButtonInHeader = settings.CommandColumn.ShowNewButton;
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + CRUDActions[0] + "/" + CRUDActions[2], HttpContext.Current, string.Empty);
+        settings.CommandColumn.ShowEditButton = !string.IsNullOrEmpty(CRUDActions[2]) && Enabled;
+        settings.SettingsCommandButton.EditButton.RenderMode = GridCommandButtonRenderMode.Image;
+        settings.SettingsCommandButton.EditButton.Image.Url = pathApp + "/Content/DevHelper/Images/" + "IconEdit_32x32.png";
+        settings.SettingsCommandButton.EditButton.Image.Height = settings.SettingsCommandButton.EditButton.Image.Width = System.Web.UI.WebControls.Unit.Pixel(25);
+        settings.SettingsCommandButton.EditButton.Image.ToolTip = "Editar";
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + CRUDActions[0] + "/" + CRUDActions[3], HttpContext.Current, string.Empty);
+        settings.CommandColumn.ShowDeleteButton = !string.IsNullOrEmpty(CRUDActions[3]) && Enabled;
+        settings.SettingsCommandButton.DeleteButton.RenderMode = GridCommandButtonRenderMode.Image;
+        settings.SettingsCommandButton.DeleteButton.Image.Url = pathApp + "/Content/DevHelper/Images/" + "IconDelete_32x32.png";
+        settings.SettingsCommandButton.DeleteButton.Image.Height = settings.SettingsCommandButton.DeleteButton.Image.Width = System.Web.UI.WebControls.Unit.Pixel(25);
+        settings.SettingsCommandButton.DeleteButton.Image.ToolTip = "Deletar";
+        //settings.CommandColumn.ShowInCustomizationForm = true;
+        //settings.ClientSideEvents.CustomButtonClick = "OnCustomButtonClick";
+        settings.CommandColumn.Visible = true;
+        //settings.CommandColumn.Caption = string.Empty;
+        if (settings.CommandColumn.ShowNewButton)
+            CommandColumnWidth += 30;
+        if (settings.CommandColumn.ShowDeleteButton)
+            CommandColumnWidth += 30;
+        if (settings.CommandColumn.ShowEditButton)
+            CommandColumnWidth += 30;
+
+        if (CRUDActions.Count >= 5)
+        {
+            settings.SetEditFormTemplateContent(c =>
+            {
+                RouteValueDictionary parametros = new RouteValueDictionary();
+                for (int i = 5; i < CRUDActions.Count; i++)
+                {
+                    string[] paramsParts = CRUDActions[i].Split(':');
+                    try
+                    {
+                        //TODO: Criar case para implementar novos tipos de parâmetros
+                        if (paramsParts.Length > 1 && paramsParts[1].ToLower().StartsWith("int"))
+                            parametros.Add(paramsParts[0], int.Parse(DataBinder.Eval(c.DataItem, paramsParts[0]).ToString()));
+                        else //Default String
+                            parametros.Add(paramsParts[0], DataBinder.Eval(c.DataItem, paramsParts[0]));
+                    }
+                    catch { parametros.Add(paramsParts[0], null); }
+                }
+                parametros.Add("isPartial", true);
+                Html.RenderAction(CRUDActions[1], CRUDActions[0], parametros);
+                //Botões dinâmicos para o formulário de inclusão/edição
+                ViewContext.Writer.Write("<div style=\"font-weight:bold;float:left;width:300px\">");
+                Html.DevExpress().Button(
+                    btnSettings =>
+                    {
+                        btnSettings.Name = "btnUpdate";
+                        btnSettings.Text = "OK";
+                        if (bool.Parse(CRUDActions[4])) //Param: AutoClose
+                                                        //btnSettings.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".UpdateEdit(); " + settings.Name + ".CancelEdit(); " + settings.Name + ".PerformCallback(); }";
+                            btnSettings.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".UpdateEdit(); " + settings.Name + ".CancelEdit(); }";
+                        else
+                            btnSettings.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".UpdateEdit(); }";
+                        //btnSettings.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".UpdateEdit(); " + settings.Name + ".PerformCallback(); }";
+                        btnSettings.Style.Add("float", "left");
+                    }).Render();
+                Html.DevExpress().Button(
+                    btnSettings =>
+                    {
+                        btnSettings.Name = "btnCancel";
+                        btnSettings.Text = "FECHAR";
+                        btnSettings.Style[HtmlTextWriterStyle.MarginLeft] = "5px";
+                        btnSettings.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".CancelEdit(); }";
+                        btnSettings.Style.Add("float", "left");
+                    }).Render();
+                ViewContext.Writer.Write("</div>");
+            });
+        }
+    }
+    #endregion
+
+    //Populando a propriedade referente à largura da coluna de comandos
+    if (CommandColumnWidth <= 30)
+        CommandColumnWidth += 30;
+    settings.CommandColumn.Width = CommandColumnWidth;
+
+    int columnIndex = 0;
+    int qtdColunasLinks = 0;
+    foreach (System.Data.DataColumn col in (System.Data.DataColumnCollection)((System.Data.DataView)Model).ToTable().Columns)
+    {
+        columnIndex++;
+        string dataType = col.DataType.ToString();
+
+        MVCxGridViewColumn newColumn = new MVCxGridViewColumn();
+
+        if (ColunasDateTime.Contains(col.Caption))
+        {
+            dataType = "System.DateTime";
+        }
+
+        switch (dataType)
+        {
+            case "System.DateTime":
+                newColumn = new MVCxGridViewColumn()
+                {
+                    FieldName = col.Caption,
+                    UnboundType = DevExpress.Data.UnboundColumnType.DateTime,
+                    ColumnType = MVCxGridViewColumnType.DateEdit,
+                    Width = System.Web.UI.WebControls.Unit.Pixel(95)
+                    //SortOrder = DevExpress.Data.ColumnSortOrder.Descending
+                };
+                newColumn.PropertiesEdit.DisplayFormatString = "d";
+                if (ColunasDateTime.Contains(col.Caption))
+                {
+                    newColumn.PropertiesEdit.DisplayFormatString = "dd/MM/yyyy HH:mm";
+                }
+                //newColumn.Settings.FilterMode = ColumnFilterMode.Value;
+                newColumn.SettingsHeaderFilter.Mode = GridHeaderFilterMode.CheckedList;
+                break;
+            case "System.Double":
+                newColumn = new MVCxGridViewColumn()
+                {
+                    FieldName = col.Caption,
+                    UnboundType = DevExpress.Data.UnboundColumnType.Decimal
+                };
+                newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(140);
+                break;
+            case "System.String":
+                newColumn = new MVCxGridViewColumn()
+                {
+                    FieldName = col.Caption,
+                    UnboundType = DevExpress.Data.UnboundColumnType.String,
+                    ColumnType = MVCxGridViewColumnType.TextBox
+                };
+                settings.EditFormLayoutProperties.Items.Add(col.Caption);
+                newColumn.SettingsHeaderFilter.Mode = GridHeaderFilterMode.List;
+                newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(200);
+                //Condição para exibir código html para colunas do tipo string
+                if (ColunasHtml.Contains(col.Caption))
+                {
+                    newColumn.SetDataItemTemplateContent(c =>
+                    {
+                        string content = DataBinder.Eval(c.DataItem, col.Caption).ToString();
+                        string contentHtmlFormatted = Html.Raw(content).ToString();
+                        ViewContext.Writer.Write(contentHtmlFormatted);
+                        ;
+                    });
+                }
+                break;
+            case "System.Int32":
+                newColumn = new MVCxGridViewColumn()
+                {
+                    FieldName = col.Caption,
+                    UnboundType = DevExpress.Data.UnboundColumnType.Object
+                };
+                settings.EditFormLayoutProperties.Items.Add(col.Caption);
+                newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(60);
+                break;
+            default:
+                newColumn = new MVCxGridViewColumn()
+                {
+                    FieldName = col.Caption
+                };
+                newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(150);
+                break;
+        }
+
+        //Definição para formato Currency
+        if (ColunasCurrency.Contains(col.Caption))
+        {
+            newColumn.PropertiesEdit.DisplayFormatString = "c";
+        }
+
+        #region COLUNAS LINKS
+        if (DicColunasLinks.ContainsKey(col.Caption))
+        {
+            newColumn.SetDataItemTemplateContent(c =>
+            {
+                string htmlColunasLinks = string.Empty;
+                if (DataBinder.Eval(c.DataItem, col.Caption).ToString() != "")
+                {
+                    foreach (var item in DicColunasLinks[col.Caption])
+                    {
+                        qtdColunasLinks++;
+                        string[] colLinkParams = item.Split('|');
+
+                        string urlIcon = pathApp + "/Content/DevHelper/Images/" + "IconLupa.png";
+                        if (colLinkParams.Length > 2 && !colLinkParams[2].Equals("TextLink"))
+                        {
+                            string iconImage = colLinkParams[2].Split('&')[0];
+                            urlIcon = pathApp + "/Content/DevHelper/Images/" + iconImage;
+                        }
+
+                        if (colLinkParams.Length == 1 || colLinkParams[1].ToLower().Equals("http"))
+                        {
+                            ///Parametrização Interna:
+                            ///0 = Url
+                            ///1 = Icon
+                            ///2 = jScript
+                            ///3 = target
+                            ///4 = title
+                            ///5 = info
+                            string[] urlParts = DataBinder.Eval(c.DataItem, colLinkParams[0]).ToString().Split('|');
+                            urlIcon = urlParts.Length > 1 && !urlParts[1].Equals("TextLink") ? pathApp + "/Content/DevHelper/Images/" + urlParts[1].Split('&')[0] : urlIcon;
+                            string jScript = urlParts.Length > 2 ? urlParts[2] : string.Empty;
+                            string target = urlParts.Length > 3 ? urlParts[3] : "_blank";
+                            string title = urlParts.Length > 4 ? urlParts[4] : colLinkParams[0];
+                            string refreshAddon = urlParts[0].Contains('?') ? "&fRefresh=" + DateTime.Now.ToString("yyyyMMddHHmmssfff") : "?fRefresh=" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
+
+                            string textLinkValue = string.Empty;
+                            if (urlParts.Length > 5 && urlParts[1].Contains("TextLink"))
+                            {
+                                textLinkValue = urlParts[5]; //DataBinder.Eval(c.DataItem, colLinkParams[0]).ToString();
+                                if (col.DataType.ToString().Equals("System.Double"))
+                                {
+                                    textLinkValue = double.Parse(textLinkValue).ToString("c");
+                                }
+                                textLinkValue += "&nbsp;";
+                            }
+                            htmlColunasLinks += "<a class=\"popupLink tm-execute\" href=\"" + urlParts[0] + refreshAddon + "\" target=\"" + target + "\" title=\"" + title + "\" onclick=\"" + jScript + "\"/>" + textLinkValue + "<img width=\"20px\" src=\"" + urlIcon + "\"/></a>";
+                        }
+                        else
+                        {
+                            string textLinkValue = string.Empty;
+                            if (colLinkParams.Length > 2 && colLinkParams[2].Contains("TextLink"))
+                            {
+                                textLinkValue = DataBinder.Eval(c.DataItem, colLinkParams[0]).ToString();
+                                if (col.DataType.ToString().Equals("System.Double"))
+                                {
+                                    textLinkValue = double.Parse(textLinkValue).ToString("c");
+                                }
+                            }
+                            //Link + QueryString (Personalizado - Utilização dos parâmetros do grid
+                            //Pega os parâmetros após os parâmetros reservados: Campo, Url, Icon
+                            string queryString = string.Empty;
+                            for (int i = 3; i < colLinkParams.Length; i++)
+                            {
+                                //colParams.Add(ColunasActionParams[i], DataBinder.Eval(c.DataItem, ColunasActionParams[i]).ToString());
+                                queryString += colLinkParams[i] + "=" + Uri.EscapeDataString(DataBinder.Eval(c.DataItem, colLinkParams[i]).ToString());
+                                if (i < colLinkParams.Length - 1)
+                                    queryString += "&";
+                            }
+                            queryString += !string.IsNullOrEmpty(queryString) ? "&fRefresh=" + DateTime.Now.ToString("yyyyMMddHHmmssfff") : "?fRefresh=" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                            string separador = !colLinkParams[1].Contains("?") ? "?" : "&";
+                            htmlColunasLinks += "<a style=\"text-decoration:none;color:#000\" href=\"" + colLinkParams[1] + separador + queryString + "\" target=\"_blank\" title=\"" + colLinkParams[0] + "\"/>" + textLinkValue + "&nbsp;<img width=\"20px\" src=\"" + urlIcon + "\"/></a>";
+                        }
+                    } //foreach
+                    ViewContext.Writer.Write(htmlColunasLinks);
+                } //Databinder
+            });
+
+            controlWidth = 0;
+            foreach (var item in DicColunasLinks[col.Caption])
+            {
+                string[] colLinkParams = item.Split('|');
+                controlWidth += (colLinkParams.Length < 3 || !colLinkParams[2].Contains("TextLink")) ? 40 : 60;
+            }
+            newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(controlWidth);
+            newColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            newColumn.Settings.AllowSort = DefaultBoolean.False;
+            newColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+            newColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            newColumn.Caption = newColumn.FieldName;
+            newColumn.AdaptivePriority = 1;
+        }
+        #endregion
+
+        #region COLUNAS IMAGES
+        if (!string.IsNullOrEmpty(col.Caption) && (ColunasImage.Contains(col.Caption) || col.Caption.Equals("Foto") || col.Caption.Equals("Imagem")))
+        {
+            newColumn.SetDataItemTemplateContent(c =>
+            {
+                Html.DevExpress().Image(imgSettings =>
+                {
+                    //string ImageUrl = DataBinder.Eval(c.DataItem, col.Caption).ToString().Replace(".","_thumb.");
+                    imgSettings.ImageUrl = DataBinder.Eval(c.DataItem, col.Caption).ToString(); //ImageUrl;
+                                                                                                //FileInfo fileInfo = new FileInfo(ImageUrl);
+                                                                                                //imgSettings.ImageUrl = !ImageUrl.Contains("thumb") ? ImageUrl.Replace(fileInfo.Name, fileInfo.Name.Replace(fileInfo.Extension,"") +"_thumb"+ fileInfo.Extension) : ImageUrl;
+                    imgSettings.Height = 50;
+                    //imgSettings.Width = 40;
+                }).Render();
+            });
+            newColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            newColumn.Settings.AllowSort = DefaultBoolean.False;
+            newColumn.Settings.AllowAutoFilter = DefaultBoolean.False;
+            newColumn.Settings.AllowHeaderFilter = DefaultBoolean.False;
+            newColumn.Caption = newColumn.FieldName;
+            //newColumn.AdaptivePriority = 1;
+        }
+        #endregion
+
+        #region COLUNAS ACTION POPUPCONTROL
+        if (DicColunasActions.ContainsKey(col.Caption))
+        {
+            if (ColunasOcultas.Contains(col.Caption))
+            {
+                continue;
+            }
+            string icon = string.Empty;
+            DefaultBoolean defaultBoolean = DefaultBoolean.False;
+            //string[] ColunasActionParams = DicColunasActions[col.Caption][0].Split('|');
+            newColumn.SetDataItemTemplateContent(c =>
+            {
+                string htmlColunasActions = string.Empty;
+                if (DataBinder.Eval(c.DataItem, col.Caption).ToString() != "")
+                {
+                    foreach (var item in DicColunasActions[col.Caption])
+                    {
+                        qtdColunasLinks++;
+                        string[] ColunasActionParams = item.Split('|');
+
+                        RouteValueDictionary parametros = new RouteValueDictionary();
+                        RouteValueDictionary colParams = new RouteValueDictionary();
+                        //PopupControl: Action
+                        if (ColunasActionParams[1].StartsWith("http") || ColunasActionParams[1].StartsWith("~"))
+                        {
+                            if (ColunasActionParams[1].StartsWith("~"))
+                                ColunasActionParams[1] = ColunasActionParams[1].Replace("~", pathApp);
+                            //INFO: col.Ordinal adicionado para evitar repetições do Name
+                            string gridKeyValue = string.Empty;
+                            foreach (var item1 in ViewData["gridKey"].ToString().Split(';'))
+                            {
+                                gridKeyValue += System.Text.RegularExpressions.Regex.Replace(DataBinder.Eval(c.DataItem, item1).ToString(), "[^0-9a-zA-Z]+", "");
+                            }
+                            parametros.Add("Name", "httpColAction" + col.Ordinal + gridKeyValue + qtdColunasLinks);
+
+                            //Pega os parâmetros após os 5(cinco) parâmetros reservados
+                            string queryString = ColunasActionParams[1].Contains('?') ? "&" : "?";
+                            for (int i = 5; i < ColunasActionParams.Length; i++)
+                                queryString += ColunasActionParams[i] + "=" + Uri.EscapeDataString(DataBinder.Eval(c.DataItem, ColunasActionParams[i]).ToString()) + "&";
+                            if (ColunasActionParams[1].ToLower().Equals("http"))
+                                parametros.Add("Url", DataBinder.Eval(c.DataItem, col.Caption).ToString());
+                            else
+                                parametros.Add("Url", ColunasActionParams[1] + queryString);
+                            //queryString = string.Empty;
+                            parametros.Add("Tema", (string)ViewData["Tema"]);
+                            parametros.Add("QueryString", queryString);
+                            parametros.Add("autoRefresh", bool.Parse(ColunasActionParams[3]));
+                            parametros.Add("parentComponent", settings.Name);
+                            ELMAR.DevHtmlHelper.Controllers.PopupControlConfig.SetUIParams(parametros, ColunasActionParams[2]);
+                            //string icon = (ColunasActionParams.Length >= 5) ? ColunasActionParams[4] : "document-open.png";
+                            icon = (ColunasActionParams.Length >= 5) && !ColunasActionParams[4].Equals("TextLink") ? ColunasActionParams[4].Split('&')[0] : "IconLupa.png";
+                            string urlIcon = pathApp + "/Content/DevHelper/Images/" + icon;
+
+                            bool showLink = true;
+                            if (ColunasActionParams.Length >= 5 && ColunasActionParams[4].Contains("TextLink"))
+                            {
+                                string textLinkValue = DataBinder.Eval(c.DataItem, ColunasActionParams[0]).ToString();
+                                if (col.DataType.ToString().Equals("System.Double"))
+                                {
+                                    if (double.Parse(textLinkValue) == 0)
+                                    {
+                                        urlIcon = string.Empty;
+                                        showLink = false;
+                                    }
+                                    textLinkValue = double.Parse(textLinkValue).ToString("c");
+                                }
+                                parametros.Add("TextLink", textLinkValue);
+                            }
+                            parametros.Add("Icon", urlIcon);
+
+                            string refreshGrid = (bool)parametros["autoRefresh"] ? settings.Name : string.Empty;
+                            string Url = ((string)parametros["Url"]).Contains("?") ? ((string)parametros["Url"]) + "&isPartial=true" : ((string)parametros["Url"]) + "?isPartial=true";
+
+                            if (showLink)
+                            {
+                                if (IsMobileDevice)
+                                {
+                                    htmlColunasActions += parametros["TextLink"] + "<a href=\"#_mainpopup_" + parametros["Name"] + "\" onclick =\"LoadMainPopupUrl('_mainpopup_" + settings.Name + "', '" + Url + "', '" + refreshGrid + "','" + parametros["Altura"] + "','" + parametros["Largura"] + "','" + parametros["LinkTip"] + "');\" class=\"popupLink tm-execute\" name=\"linkPopup_" + parametros["Name"] + "\" id=\"linkPopup_" + parametros["Name"] + "\" title=\"" + parametros["TextLink"] + "\">";
+                                }
+                                else
+                                {
+                                    htmlColunasActions += parametros["TextLink"] + "<a href=\"#\" onclick =\"LoadMainPopupUrl('_mainpopup_" + settings.Name + "', '" + Url + "', '" + refreshGrid + "','" + parametros["Altura"] + "','" + parametros["Largura"] + "','" + parametros["LinkTip"] + "');\" class=\"popupLink tm-execute\" name=\"linkPopup_" + ViewData["gridName"] + "\" id=\"linkPopup_" + parametros["Name"] + "\" title=\"" + parametros["TextLink"] + "\">";
+                                }
+
+                                if (parametros["Icon"] != null)
+                                {
+                                    htmlColunasActions += parametros["Link"] + "<img height=\"21\" src=\"" + parametros["Icon"] + "\" title = \"" + parametros["LinkTip"] + "\" />";
+                                }
+                                else
+                                {
+                                    htmlColunasActions += parametros["Link"];
+                                }
+                                htmlColunasActions += "</a>";
+                            }
+                            else
+                            {
+                                htmlColunasActions += parametros["TextLink"];
+                            }
+                            //htmlColunasActions += Html.Action("PopupControlPartial", "DevHelper", parametros).ToHtmlString();
+                        }
+                        else if (ColunasActionParams.Length >= 6)
+                        {
+                            string gridKeyValue = string.Empty;
+                            foreach (var item2 in ViewData["gridKey"].ToString().Split(';'))
+                            {
+                                //gridKeyValue += System.Text.RegularExpressions.Regex.Replace(DataBinder.Eval(c.DataItem, item2).ToString(), "[^0-9a-zA-Z]+", "");
+                                try
+                                {
+                                    gridKeyValue += System.Text.RegularExpressions.Regex.Replace(DataBinder.Eval(c.DataItem, item2).ToString(), "[^0-9a-zA-Z]+", "");
+                                }
+                                catch
+                                {
+                                    gridKeyValue = item2.Replace("|", "");
+                                }
+                            }
+                            parametros.Add("Name", ELMAR.DevHtmlHelper.Models.Util.ConvertToAlphaNumeric(col.Caption) + col.Ordinal + gridKeyValue + qtdColunasLinks);
+
+                            //Pega os parâmetros após os 6(seis) parâmetros reservados
+                            for (int i = 6; i < ColunasActionParams.Length; i++)
+                            {
+                                colParams.Add(ColunasActionParams[i], DataBinder.Eval(c.DataItem, ColunasActionParams[i]).ToString());
+                            }
+                            ELMAR.DevHtmlHelper.Controllers.PopupControlConfig.SetUIParams(parametros, ColunasActionParams[3]);
+                            parametros.Add("Params", colParams);
+                            parametros.Add("Action", ColunasActionParams[1]);
+                            parametros.Add("Controller", ColunasActionParams[2]);
+                            parametros.Add("Tema", (string)ViewData["Tema"]);
+                            parametros.Add("parentComponent", settings.Name);
+                            parametros.Add("autoRefresh", bool.Parse(ColunasActionParams[4]));
+                            //Adicionando o ícone personalizado
+                            icon = (ColunasActionParams.Length >= 6) && !ColunasActionParams[5].Equals("TextLink") ? ColunasActionParams[5].Split('&')[0] : "IconLupa.png";
+                            string urlIcon = pathApp + "/Content/DevHelper/Images/" + icon;
+
+                            bool showLink = true;
+                            if (ColunasActionParams.Length >= 6 && ColunasActionParams[5].Contains("TextLink"))
+                            {
+                                string textLinkValue = DataBinder.Eval(c.DataItem, ColunasActionParams[0]).ToString();
+                                if (col.DataType.ToString().Equals("System.Double"))
+                                {
+                                    if (double.Parse(textLinkValue) == 0)
+                                    {
+                                        urlIcon = string.Empty;
+                                        showLink = false;
+                                    }
+                                    textLinkValue = double.Parse(textLinkValue).ToString("c");
+                                }
+                                parametros.Add("TextLink", textLinkValue);
+                            }
+                            parametros.Add("Icon", urlIcon);
+
+                            string Url = this.Url.Action((string)parametros["Action"], (string)parametros["Controller"], (RouteValueDictionary)parametros["Params"]);
+                            Url = Url.Contains("?") ? Url + "&isPartial=true" : Url + "?isPartial=true";
+                            parametros.Add("Url", Url);
+
+                            string refreshGrid = (bool)parametros["autoRefresh"] ? settings.Name : string.Empty;
+
+                            if (showLink)
+                            {
+                                if (IsMobileDevice)
+                                {
+                                    htmlColunasActions += parametros["TextLink"] + "<a href=\"#_mainpopup_" + parametros["Name"] + "\" onclick =\"LoadMainPopupUrl('_mainpopup_" + settings.Name + "', '" + parametros["Url"] + "','" + refreshGrid + "','" + parametros["Altura"] + "','" + parametros["LinkTip"] + "');\" class=\"popupLink tm-execute\" id=\"linkPopup_" + parametros["Name"] + "\" title=\"" + parametros["TextLink"] + "\">";
+                                }
+                                else
+                                {
+                                    htmlColunasActions += parametros["TextLink"] + "<a href=\"#\" onclick =\"LoadMainPopupUrl('_mainpopup_" + settings.Name + "', '" + parametros["Url"] + "','" + refreshGrid + "','" + parametros["Altura"] + "','" + parametros["Largura"] + "','" + parametros["LinkTip"] + "');\" class=\"popupLink tm-execute\" id=\"linkPopup_" + parametros["Name"] + "\" title=\"" + parametros["TextLink"] + "\">";
+                                }
+
+                                if (parametros["Icon"] != null)
+                                {
+                                    htmlColunasActions += parametros["Link"] + "<img height=\"21\" src=\"" + parametros["Icon"] + "\" title = \"" + parametros["LinkTip"] + "\" />";
+                                }
+                                else
+                                {
+                                    htmlColunasActions += parametros["Link"];
+                                }
+                                htmlColunasActions += "</a>";
+                            }
+                            else
+                            {
+                                htmlColunasActions += parametros["TextLink"];
+                            }
+                            //htmlColunasActions += Html.Action("PopupControlPartial", "DevHelper", parametros).ToHtmlString();
+                        }
+                        else
+                        {   //PartialView Call
+                            string gridKeyValue = string.Empty;
+                            foreach (var item3 in ViewData["gridKey"].ToString().Split(';'))
+                            {
+                                gridKeyValue += System.Text.RegularExpressions.Regex.Replace(DataBinder.Eval(c.DataItem, item3).ToString(), "[^0-9a-zA-Z]+", "");
+                            }
+                            parametros.Add("Name", ELMAR.DevHtmlHelper.Models.Util.ConvertToAlphaNumeric(col.Caption) + col.Ordinal + gridKeyValue + qtdColunasLinks);
+                            parametros.Add("PViewName", ColunasActionParams[1]);
+                            parametros.Add("autoRefresh", bool.Parse(ColunasActionParams[2]));
+                            //TODO: Verificar condição [ColunasActionParams.Length >= 6]
+                            icon = (ColunasActionParams.Length >= 5) && !ColunasActionParams[4].Equals("TextLink") ? ColunasActionParams[4].Split('&')[0] : "IconLupa.png";
+                            string urlIcon = pathApp + "/Content/DevHelper/Images/" + icon;
+                            if (ColunasActionParams.Length >= 5 && ColunasActionParams[4].Contains("TextLink"))
+                            {
+                                string textLinkValue = DataBinder.Eval(c.DataItem, ColunasActionParams[0]).ToString();
+                                if (col.DataType.ToString().Equals("System.Double"))
+                                {
+                                    if (double.Parse(textLinkValue) == 0)
+                                    {
+                                        urlIcon = string.Empty;
+                                    }
+                                    textLinkValue = double.Parse(textLinkValue).ToString("c");
+                                }
+                                parametros.Add("TextLink", textLinkValue);
+                            }
+                            parametros.Add("Icon", urlIcon);
+                            ELMAR.DevHtmlHelper.Controllers.PopupControlConfig.SetUIParams(parametros, ColunasActionParams[5]);
+
+                            //TODO: Verificar desempenho para otimização
+                            htmlColunasActions += Html.Action("PopupControlPartial", "DevHelper", parametros).ToHtmlString();
+                            htmlColunasActions += DataBinder.Eval(c.DataItem, col.Caption);
+                        }
+                    } //Foreach DicColunasActions
+                    ViewContext.Writer.Write(htmlColunasActions);
+                } //If DataBinder (Contém conteúdo)
+            }); //Set DataItemTemplate
+
+            controlWidth = 0;
+            foreach (var item in DicColunasActions[col.Caption])
+            {
+                string[] ColunasActionParams = item.Split('|');
+                if (((ColunasActionParams.Length >= 5 && ColunasActionParams[4].Contains("TextLink")) || (ColunasActionParams.Length >= 6 && ColunasActionParams[5].Contains("TextLink"))))
+                {
+                    controlWidth += 60;
+                    defaultBoolean = DefaultBoolean.True;
+                }
+                else
+                {
+                    controlWidth += 40;
+                    //newColumn.FieldName = string.Empty;
+                }
+            }
+            //newColumn.FieldName = "";
+            newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(controlWidth);
+            newColumn.CellStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+            newColumn.Settings.AllowSort = defaultBoolean;
+            newColumn.Settings.AllowAutoFilter = defaultBoolean;
+            newColumn.Settings.AllowHeaderFilter = defaultBoolean;
+            newColumn.Caption = newColumn.FieldName;
+            newColumn.AdaptivePriority = 1;
+        } //Dictionary (Contains Column)
+        #endregion
+
+        //Define o tamanho por InfoColunas
+        string setWidth = gridModel.GetColParametro(col.Caption, "Width", newColumn.Width.Value.ToString()).ToLower().Replace("px", string.Empty);
+        newColumn.Width = System.Web.UI.WebControls.Unit.Pixel(int.Parse(setWidth));
+
+        //Parametrização corretiva para o Tema iOS
+        if (((string)ViewData["Tema"]).Equals("iOS"))
+        {
+            newColumn.CellStyle.Font.Size = newColumn.HeaderStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(11);
+            newColumn.HeaderStyle.BackColor = System.Drawing.Color.Silver;
+        }
+
+        newColumn.HeaderStyle.Wrap = DefaultBoolean.True;
+        newColumn.ReadOnly = false;
+
+        //Adicionando a nova coluna ao grid
+        if (columnIndex - qtdColunasLinks > 2)
+        {
+            newColumn.AdaptivePriority = 1;
+        }
+
+        newColumn.SetHeaderTemplateContent(content =>
+        {
+            var itemPropTag = ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps.ContainsKey(modulo) && ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo].ContainsKey(newColumn.FieldName) ? ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[modulo][newColumn.FieldName] : string.Empty;
+            ViewContext.Writer.Write("<div itemprop=\"" + itemPropTag + "\">" + newColumn.FieldName + "</div>");
+        });
+
+        //Adição da coluna no GridView
+        settings.Columns.Add(newColumn);
+    } //foreach Adição de colunas
+
+    //Define o filtro contém como a seleção padrão
+    foreach (GridViewDataColumn gridColumn in settings.Columns)
+    {
+        if (gridColumn.UnboundType == DevExpress.Data.UnboundColumnType.String)
+            gridColumn.Settings.AutoFilterCondition = AutoFilterCondition.Contains;
+    }
+
+    settings.SettingsPager.PageSize = (int)ViewData["gridTamPagina"];
+    settings.Theme = ViewData["Tema"].ToString();
+    settings.EnableTheming = true;
+    settings.SettingsBehavior.AllowSelectByRowClick = false;
+    settings.SettingsBehavior.AllowSort = true;
+    settings.SettingsBehavior.AllowFocusedRow = true;
+    settings.Settings.ShowGroupPanel = (bool)ViewData["ExibeAgrupador"];
+    settings.SettingsBehavior.AllowFixedGroups = true;
+    settings.Settings.ShowGroupFooter = (Totalizadores.Count > 0 || TotalizadoresGrp.Count > 0) ? GridViewGroupFooterMode.VisibleIfExpanded : GridViewGroupFooterMode.Hidden;
+    //settings.SettingsBehavior.ColumnMoveMode = GridColumnMoveMode.ThroughHierarchy;
+    settings.SettingsSearchPanel.Visible = (bool)ViewData["ExibeLinhaFiltro"];
+    settings.Settings.ShowFilterRow = (bool)ViewData["ExibeLinhaFiltro"];
+    settings.Settings.ShowTitlePanel = true;
+    settings.Settings.ShowFilterRowMenu = true;
+    settings.Settings.ShowColumnHeaders = !activateAdaptative;
+    settings.Settings.ShowHeaderFilterBlankItems = false;
+    settings.Settings.EnableFilterControlPopupMenuScrolling = true;
+    settings.Settings.ShowFilterRowMenuLikeItem = true;
+    settings.SettingsDetail.ExportMode = GridViewDetailExportMode.All;
+    settings.Settings.ShowFilterBar = ((bool)ViewData["ExibeLinhaFiltro"]) ? GridViewStatusBarMode.Visible : GridViewStatusBarMode.Hidden;
+
+    if (ColunasOcultas.Count > 0)
+    {
+        foreach (string name in ColunasOcultas)
+        {
+            if (settings.Columns[name] != null && !string.IsNullOrEmpty(name))
+                settings.Columns[name].Visible = false;
+        }
+    }
+    //Oculta a coluna gridKey, caso exista
+    if (((System.Data.DataView)Model).Table.Columns.Contains("gridKey"))
+    {
+        settings.Columns["gridKey"].Visible = false;
+    }
+
+    #region Definição de Totalizadores
+    int qtdCustomSummaryColumns = 0;
+    if (Totalizadores.Count > 0)
+    {
+        string Custom = "";
+        foreach (string name in Totalizadores)
+        {
+            string[] totalizadoresParams = name.Split('|');
+
+            //Somatório condicional (calculado ou filtrado)
+            //Params: [2] Coluna do grid para comparação [3] Valor para a comparação
+            Custom = "";
+            if (totalizadoresParams.Length > 2)
+            {
+                Custom = "_CustomSummary";
+                //Adicionando a coluna auxiliar
+                settings.Columns.Add(column =>
+                {
+                    column.FieldName = totalizadoresParams[0] + Custom;
+                    column.UnboundType = DevExpress.Data.UnboundColumnType.Decimal;
+                    column.PropertiesEdit.DisplayFormatString = "c";
+                    column.Visible = false;
+                });
+                qtdCustomSummaryColumns++;
+            }
+
+            //Configuração do formato dos totalizadores
+            string DisplayFormat = ".";
+            DisplayFormat = ColunasCurrency.Contains(totalizadoresParams[0]) ? "{0:c2}" : DisplayFormat;
+            DevExpress.Data.SummaryItemType SummaryType = DevExpress.Data.SummaryItemType.Sum;
+            string TotalTipoDesc = " ";
+
+            if (totalizadoresParams.Length > 1)
+            {
+                switch (totalizadoresParams[1])
+                {
+                    case "Avg":
+                        TotalTipoDesc = " Média: ";
+                        SummaryType = DevExpress.Data.SummaryItemType.Average;
+                        break;
+                    case "Count":
+                        TotalTipoDesc = " Qtde: ";
+                        SummaryType = DevExpress.Data.SummaryItemType.Count;
+                        break;
+                    case "Max":
+                        TotalTipoDesc = " Máx.: ";
+                        SummaryType = DevExpress.Data.SummaryItemType.Max;
+                        break;
+                    case "Min":
+                        TotalTipoDesc = " Mín.: ";
+                        SummaryType = DevExpress.Data.SummaryItemType.Min;
+                        break;
+                    case "Sum":
+                    default:
+                        break;
+                }
+            }
+
+            //Totalizadores de Grupos não são exibidos em Totais Gerais
+            if (!TotalizadoresGrp.Contains(name))
+            {
+                ASPxSummaryItem summaryItem = new ASPxSummaryItem() { SummaryType = SummaryType, FieldName = totalizadoresParams[0] + Custom, ShowInColumn = totalizadoresParams[0], DisplayFormat = TotalTipoDesc + DisplayFormat };
+                if (!settings.TotalSummary.Contains(summaryItem))
+                    settings.TotalSummary.Add(summaryItem);
+            }
+
+            ASPxSummaryItem grpItem = new ASPxSummaryItem() { SummaryType = SummaryType, FieldName = totalizadoresParams[0] + Custom, DisplayFormat = totalizadoresParams[0] + ": " + TotalTipoDesc + DisplayFormat };
+
+            ASPxSummaryItem grupo = (from x in settings.GroupSummary where x.FieldName.Equals(totalizadoresParams[0] + Custom) select x).FirstOrDefault();
+            if (grupo == null)
+            {
+                settings.GroupSummary.Add(grpItem);
+                grpItem = new ASPxSummaryItem() { SummaryType = SummaryType, FieldName = totalizadoresParams[0] + Custom, ShowInGroupFooterColumn = totalizadoresParams[0], DisplayFormat = TotalTipoDesc + DisplayFormat };
+                settings.GroupSummary.Add(grpItem);
+            }
+
+            settings.SummaryDisplayText = (sender, e) =>
+            {
+                //settings.Styles.Cell.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+                if (e.IsGroupSummary)
+                {
+                    e.EncodeHtml = false;
+                    e.Text = "<span style=\"font-weight:bold\">" + e.Text + "</span>";
+                }
+            };
+
+        } //FOR totalizadores
+
+        #region População personalizada da(s) coluna(s) que contém a tag '_CustomSummary' - TOTALIZADORES
+        settings.CustomUnboundColumnData = (sender, e) =>
+        {
+            //FOR para colunas '_CustomSummary' (Totalizadores)
+            foreach (string name in Totalizadores)
+            {
+                Custom = "_CustomSummary";
+
+                string[] totalizadoresParams = name.Split('|');
+
+                if (totalizadoresParams.Length > 2)
+                {
+
+                    if (e.Column.FieldName.Contains(totalizadoresParams[0] + Custom))
+                    {
+                        decimal valor = 0;
+                        decimal.TryParse(e.GetListSourceFieldValue(totalizadoresParams[0]).ToString(), out valor);
+                        string filtro = (string)e.GetListSourceFieldValue(totalizadoresParams[2]);
+                        e.Value = 0;
+
+                        string valorCompara = (string)totalizadoresParams[3];
+                        //Operações
+                        if (valorCompara.StartsWith(">="))
+                        {
+                            float valor1 = 0;
+                            float.TryParse(filtro, out valor1);
+                            float valorToCompare = 0;
+                            float.TryParse(valorCompara.Replace(">=", ""), out valorToCompare);
+                            if (valor1 >= valorToCompare)
+                                e.Value = valor;
+                        }
+                        else if (valorCompara.StartsWith("<="))
+                        {
+                            float valor1 = 0;
+                            float.TryParse(filtro, out valor1);
+                            float valorToCompare = 0;
+                            float.TryParse(valorCompara.Replace("<=", ""), out valorToCompare);
+                            if (valor1 <= valorToCompare)
+                                e.Value = valor;
+                        }
+                        else
+                        { //Operação default '='
+                          //Comparação de String
+                            if (valorCompara.Contains("'"))
+                            {
+                                if (filtro.Trim().ToUpper().Equals(valorCompara.Replace("=", "").Replace("'", "").Trim().ToUpper()))
+                                    e.Value = valor;
+                            }
+                            else
+                            { //Comparação de valor numérico
+                                float valor1 = 0;
+                                float.TryParse(filtro, out valor1);
+                                float valorToCompare = 0;
+                                float.TryParse(valorCompara.Replace("=", ""), out valorToCompare);
+                                if (valor1 == valorToCompare)
+                                    e.Value = valor;
+                            }
+                        }
+                    } //if column fieldname
+                } //totalizador parâmetro Length > 2
+            } //For Totalizadores
+        };
+        #endregion
+    }
+    #endregion
+
+    #region Definição dos Agrupadores
+    //List<string> AgrupadoresFields = new List<string>();
+    if (Agrupadores.Count > 0 && !isEmpty)
+    {
+        settings.PreRender = (s, e) =>
+        {
+            var gridView = s as MVCxGridView;
+            gridView.ClearSort();
+            foreach (string name in Agrupadores)
+            {
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                string[] groupInfo = name.Split('|');
+                string order = groupInfo.Length > 1 ? groupInfo[1] : "";
+                if (gridView != null && gridView.Columns[groupInfo[0]] != null)
+                {
+                    gridView.GroupBy(gridView.Columns[groupInfo[0]]);
+                    if (!string.IsNullOrEmpty(order))
+                    {
+                        gridView.SortBy(gridView.Columns[groupInfo[0]], DevExpress.Data.ColumnSortOrder.Descending);
+                    }
+                }
+            }
+            if (microDataActive || (bool)ViewData["Expanded"])
+            {
+                gridView.ExpandAll();
+            }
+        };
+    }
+    #endregion
+
+    settings.Settings.ShowFooter = (bool)ViewBag.showFooter;
+    settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+    settings.SettingsLoadingPanel.Text = "Carregando...";
+    settings.Width = Largura;
+    settings.Height = Altura;
+    settings.SettingsText.FilterBarCreateFilter = "Personalizar Filtro";
+    settings.Settings.EnableFilterControlPopupMenuScrolling = true;
+    settings.Settings.ShowHeaderFilterButton = true;
+    settings.SettingsText.HeaderFilterShowAll = "Todos";
+    settings.Settings.HorizontalScrollBarMode = ((bool)ViewData["autoScroll"] && !IsMobileDevice && !activateAdaptative) ? ScrollBarMode.Auto : ScrollBarMode.Hidden;
+    settings.Settings.VerticalScrollBarMode = ScrollBarMode.Hidden;
+    settings.SettingsBehavior.AllowSelectSingleRowOnly = !ViewData["SelectRowMode"].Equals("Multi");
+    settings.SettingsBehavior.SelectionStoringMode = GridViewSelectionStoringMode.PerformanceOptimized;
+    settings.SettingsBehavior.AllowFocusedRow = !(ViewData["SelectRowMode"].Equals("None") || ViewData["SelectRowMode"].Equals("Disabled"));
+    settings.EnableRowsCache = false;
+    settings.Settings.ShowColumnHeaders = true;
+    settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.Control;
+    settings.Styles.Cell.Wrap = DefaultBoolean.True;
+    settings.Styles.AdaptiveHeaderPanel.CssClass = settings.Styles.AdaptiveFooterPanel.CssClass = "hideHeader";
+
+}).Bind(Model).GetHtml(); //.BindToEF(string.Empty, string.Empty, (s, e) => { e.QueryableSource = ViewBag.efModel; }).GetHtml();
+     
+    if ((ViewData["ExibeExportador"] != null && (bool)ViewData["ExibeExportador"]) && (ViewData["isCallBack"] == null || !(bool)ViewData["isCallBack"]) && (((string)ViewData["ExportadorPosicao"]).Equals("Rodape") || ((string)ViewData["ExportadorPosicao"]).Equals("Ambos")) && !isEmpty)
+    {
+        @Html.Partial("DevHelper/_GridViewExporterPartial")
+    }
+}

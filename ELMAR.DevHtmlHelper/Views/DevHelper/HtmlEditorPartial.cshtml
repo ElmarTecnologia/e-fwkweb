@@ -1,0 +1,69 @@
+﻿@{
+    System.Web.UI.WebControls.Unit Altura = 0;
+    System.Web.UI.WebControls.Unit Largura = 0;
+    if (ViewData["Largura"].ToString().Contains("%"))
+    {
+        Largura = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewData["Largura"].ToString().Replace("%", "")));
+    }
+    else
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewData["Largura"].ToString().Replace("px", "")));
+    }
+    if (ViewData["Altura"].ToString().Contains("%"))
+    {
+        Altura = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewData["Altura"].ToString().Replace("%", "")));
+    }
+    else
+    {
+        Altura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewData["Altura"].ToString().Replace("px", "")));
+    }
+}
+@Html.DevExpress().HtmlEditor(
+        settings =>
+        {
+            settings.Name = ViewBag.Name;
+            settings.CallbackRouteValues =
+            new
+            {
+                Name = ViewBag.Name,
+                Tema = ViewBag.Tema,
+                Controller = (string)ViewBag.Controller,
+                Action = (string)ViewBag.Action,
+                isCallBack = true
+            };
+            settings.Settings.AllowHtmlView = false;
+            settings.Settings.AllowDesignView = false;
+            settings.Settings.AllowPreview = false;
+            settings.Height = Altura;
+            settings.Width = Largura;
+            settings.Styles.HtmlViewArea.Font.Names = new string[] { "Consolas", "Courier New", "monospace" };
+            settings.Styles.HtmlViewArea.Font.Size = System.Web.UI.WebControls.FontUnit.Parse("13px");
+            settings.Style.Add("float", "left");
+            HtmlEditorToolbar toolbar = new HtmlEditorToolbar();
+            toolbar.Items.Add(new ToolbarBoldButton());
+            toolbar.Items.Add(new ToolbarItalicButton());
+            toolbar.Items.Add(new ToolbarUnderlineButton());
+            if (ViewBag.isAdvance && !ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+            {
+                toolbar.Items.Add(new ToolbarUndoButton());
+                toolbar.Items.Add(new ToolbarRedoButton());
+                ToolbarFontNameEdit fontNameEdit = new ToolbarFontNameEdit(true);
+                fontNameEdit.CreateDefaultItems();
+                toolbar.Items.Add(fontNameEdit);
+                ToolbarFontSizeEdit fontSizeEdit = new ToolbarFontSizeEdit(true);
+                fontSizeEdit.CreateDefaultItems();
+                ToolbarFontColorButton fontColorEdit = new ToolbarFontColorButton(true);
+                toolbar.Items.Add(fontSizeEdit);
+                toolbar.Items.Add(fontColorEdit);
+                toolbar.Items.Add(new ToolbarStrikethroughButton());
+                toolbar.Items.Add(new ToolbarJustifyLeftButton(true));
+                toolbar.Items.Add(new ToolbarJustifyCenterButton());
+                toolbar.Items.Add(new ToolbarJustifyRightButton());
+                toolbar.Items.Add(new ToolbarInsertOrderedListButton());
+                toolbar.Items.Add(new ToolbarInsertUnorderedListButton());
+            }
+            settings.Html = ViewBag.Valor;
+            //toolbar.Items.Add(new ToolbarInsertImageDialogButton(true));
+            settings.Toolbars.Add(toolbar);
+            settings.Theme = ViewBag.Tema;
+        }).GetHtml()

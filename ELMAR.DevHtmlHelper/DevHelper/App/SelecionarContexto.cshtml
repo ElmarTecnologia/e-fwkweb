@@ -1,0 +1,6 @@
+﻿@using (Html.BeginForm("SelecionarContexto", "Usuario"))
+{
+    @Html.Hidden("RedirectTo", ViewData["RedirectTo"])
+    @Html.DropDownList("Contexto", new SelectList(ViewBag.Contextos, "Codigo", "Descricao"))     
+    <input type="submit" value="ACESSAR"/>  
+}

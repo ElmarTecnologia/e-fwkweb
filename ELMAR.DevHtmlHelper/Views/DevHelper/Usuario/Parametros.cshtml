@@ -1,0 +1,28 @@
+﻿<h2>Gerenciamento de Parâmetros</h2>
+
+@Html.Action("GridViewPartial", "DevHelper", new
+                            {
+                                dtSource = ViewData["dtSource"],
+                                //sqlCode = ViewData["sqlCode"],
+                                //bdConnection = "ConexaoMySQL",
+                                gridName = "Parametros",
+                                //gridKey = "Codigo",
+                                gridKey = "gridKey",
+                                Tema = ViewBag.Tema,
+                                tamPagina = 30,
+								//Agrupadores = "",
+                                ExportadorPosicao = "Rodape",
+                                //Expanded = false,
+                                DetailAction = "",
+                                //Info = "",
+                                //Totalizadores = "",
+                                ExibeExportador = true,
+								ExibeLinhaFiltro = true,
+								ExibeAgrupador = true,
+                                gridTamPagina = 30,
+                                ColunasOcultas = "gridKey",
+                                CRUDActions = "Fwk|SalvarParametro|SalvarParametro|DeleteParametro|false|Codigo",
+                                /*ColunasActions = "EDITAR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Create/?isPartial=true&|Gerenciamento|true|IconEdit.png|Email;"+
+                                                 "EXCLUIR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Delete/?isPartial=true&|Gerenciamento|true|IconDelete.png|Email"*/
+                               
+                            })

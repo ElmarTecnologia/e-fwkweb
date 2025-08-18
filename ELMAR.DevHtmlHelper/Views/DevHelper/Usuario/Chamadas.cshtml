@@ -1,0 +1,28 @@
+﻿<h2>Gerenciamento de Chamadas</h2>
+
+@Html.Action("GridViewPartial", "DevHelper", new
+                            {
+                                dtSource = ViewData["dtSource"],
+                                //sqlCode = ViewData["sqlCode"],
+                                //bdConnection = "ConexaoMySQL",
+                                gridName = "Chamadas",
+                                //gridKey = "Action;Controller",
+                                gridKey = "gridKey",
+                                Tema = ViewBag.Tema,
+                                tamPagina = 30,
+								Agrupadores = "Controller",
+                                ExportadorPosicao = "Rodape",
+                                //Expanded = false,
+                                DetailAction = "",
+                                //Info = "",
+                                //Totalizadores = "",
+                                ExibeExportador = true,
+								ExibeLinhaFiltro = true,
+								ExibeAgrupador = true,
+                                gridTamPagina = 30,
+                                ColunasOcultas = "GridKey",
+                                CRUDActions = "Fwk|SalvarChamada|SalvarChamada|SalvarChamada|false|Action|Controller",
+                                /*ColunasActions = "EDITAR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Create/?isPartial=true&|Gerenciamento|true|IconEdit.png|Email;"+
+                                                 "EXCLUIR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Delete/?isPartial=true&|Gerenciamento|true|IconDelete.png|Email"*/
+                               
+                            })

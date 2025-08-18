@@ -1,0 +1,80 @@
+﻿@{
+    //Tratamento para a unidade das dimensões do painel
+    System.Web.UI.WebControls.Unit Altura = 0;
+    System.Web.UI.WebControls.Unit Largura = 0;
+    if (ViewBag.Altura.Contains("%")) //Não aceita %
+    {
+        Altura = System.Web.UI.WebControls.Unit.Pixel(300); //System.Web.UI.WebControls.Unit.Percentage(int.Parse(ViewBag.Altura.Replace("%","")));
+    }
+    else
+    {
+        Altura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Altura.Replace("px", "")));
+    }
+    if (ViewBag.Largura.Contains("%")) //Não aceita %
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(350); //System.Web.UI.WebControls.Unit.Percentage(int.Parse(ViewBag.Largura.Replace("%", "")));
+    }
+    else
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Largura.Replace("px", "")));
+    }
+}
+
+@Html.DevExpress().Chart(settings => {
+    settings.Name = (ViewData["chartName"] != null && (string)ViewData["chartName"] != "") ? (string)ViewData["chartName"] : (string)ViewData["chartTitulo"];
+    settings.Theme = ViewBag.Tema;
+    settings.Titles.Add(new ChartTitle() {
+        Font = new System.Drawing.Font("Tahoma", 14),
+        Text = (string)ViewData["chartTitulo"]
+    });
+
+    string[] Series = null;
+    if (ViewData["Series"] != null && !string.IsNullOrEmpty(ViewData["Series"].ToString()))
+    {
+        Series = ViewData["Series"].ToString().Split(';');
+
+        foreach (var item in Series)
+        {
+            Series series = new Series(item, (DevExpress.XtraCharts.ViewType)Enum.Parse(typeof(DevExpress.XtraCharts.ViewType), (string)ViewBag.Tipo, true));
+
+            series.ArgumentDataMember = (string)ViewData["chartArgumento"];
+            series.ValueDataMembers[0] = (string)ViewData["chartValor"];
+
+            series.ValueScaleType = ScaleType.Numerical;
+            series.LabelsVisibility = (bool)ViewData["ExibeLegenda"] || ((string)ViewBag.Tipo).Equals("Pie") ? DefaultBoolean.True : DefaultBoolean.False;
+            series.Label.TextOrientation = TextOrientation.Horizontal;
+            series.CrosshairHighlightPoints = DefaultBoolean.True;
+            series.Label.TextAlignment = System.Drawing.StringAlignment.Center;
+            series.Label.TextPattern = ((string)ViewBag.Tipo).Equals("Pie") ? "{A}: {VP:P0}" : "{A}: {V:c2}";
+
+            settings.Series.Add(series);
+        }
+    }
+
+    //Séries dinâmcias
+    if (ViewData["SeriesData"] != null && !string.IsNullOrEmpty(ViewData["SeriesData"].ToString()))
+    {
+        settings.SeriesDataMember = (string)ViewData["SeriesData"];
+        settings.SeriesTemplate.ArgumentDataMember = (string)ViewData["chartArgumento"];
+        settings.SeriesTemplate.ValueDataMembers[0] = (string)ViewData["chartValor"];
+        settings.SeriesTemplate.ShowInLegend = true;
+    }
+
+    //settings.Legend.Visible = (bool)ViewData["ExibeLegenda"];
+    settings.Legend.Visible = false;
+
+    settings.Height = Altura;
+    settings.Width = Largura;
+
+    if(settings.Diagram is XYDiagram){
+        XYDiagram diagram = (XYDiagram)settings.Diagram;
+        diagram.Rotated = !ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request);
+        diagram.AxisY.Title.Text = (string)ViewData["chartSubTitulo"];
+        diagram.AxisY.Title.Visible = true;
+    }
+
+    settings.ToolTipOptions.ShowForPoints = true;
+    settings.ToolTipOptions.ShowForSeries = true;
+    settings.ToolTipEnabled = DefaultBoolean.True;
+
+}).Bind(Model).GetHtml()

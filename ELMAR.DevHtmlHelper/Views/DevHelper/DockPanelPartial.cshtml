@@ -1,0 +1,133 @@
+﻿@{
+    bool Enabled = true;
+    ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = new ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao();
+    //string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX(HttpContext.Current, "", "CTX", true);
+    //string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCookie(HttpContext.Current, "", "CTX", true);
+    string CTX = ViewBag.CTX;
+    //Tratamento para a unidade das dimensões do painel
+    System.Web.UI.WebControls.Unit Altura_dockPanel = 0;
+    System.Web.UI.WebControls.Unit Largura_dockPanel = 0;
+    if (ViewBag.Altura_dockPanel.Contains("%"))
+    {
+        Altura_dockPanel = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewBag.Altura_dockPanel.Replace("%", "")));
+    }
+    else
+    {
+        Altura_dockPanel = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Altura_dockPanel.Replace("px", "")));
+    }
+    if (ViewBag.Largura_dockPanel.Contains("%"))
+    {
+        Largura_dockPanel = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewBag.Largura_dockPanel.Replace("%", "")));
+    }
+    else
+    {
+        Largura_dockPanel = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Largura_dockPanel.Replace("px", "")));
+    }
+}
+
+@Html.DevExpress().DockPanel(settings => {
+    settings.Name = "dockPanel"+ViewBag.Name;
+    settings.OwnerZoneUID = "dockZone_"+ViewBag.Name;
+    settings.HeaderText = ViewBag.Titulo;
+    settings.Height = Altura_dockPanel;
+    settings.Width = Largura_dockPanel;
+    if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+    {
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    }
+    settings.ShowCloseButton = ViewBag.CloseButton;
+    settings.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+    settings.ShowHeader = true;
+    settings.Theme = ViewBag.Tema;
+    //settings.ShowSizeGrip = ShowSizeGrip.False;
+    ViewDataDictionary viewDataDictionary = new ViewDataDictionary();
+    foreach (var item in (RouteValueDictionary)ViewBag.Params)
+    {
+        viewDataDictionary.Add(item.Key, item.Value);
+    }
+    if (!string.IsNullOrEmpty(ViewBag.Url))
+    {
+        //TODO: Adicionar validação para links a partir de Actions internas
+        settings.ContentUrl = ViewBag.Url;
+        settings.Style.Add("overflow","hidden");
+    }
+    else if (!string.IsNullOrEmpty(ViewBag.PViewName))
+    {
+        settings.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                Html.Partial((string)ViewBag.PViewName, null, viewDataDictionary)
+            );
+        });
+    }
+    else if (!string.IsNullOrEmpty(ViewBag.HtmlContent))
+    {
+        settings.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                ViewBag.HtmlContent
+            );
+        });
+    }
+    else
+    {
+        //Validando a autorização antes de exibir o resultado da Action
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, CTX);
+        if (Enabled)
+        {
+            settings.SetContent(() =>
+            {
+                ViewContext.Writer.Write(
+                    Html.Action((string)ViewBag.Action, (string)ViewBag.Controller, (RouteValueDictionary)ViewBag.Params)
+                );
+            });
+        }
+        else {
+            //Exibe a tela padrão para efetuar o Login
+            if (ViewBag.LoginUrl.Contains("cshtml"))
+            {
+                ViewBag.Result = userAut.Info;
+                settings.SetContent(() =>
+                {
+                    ViewContext.Writer.Write(
+                        Html.Partial((string)ViewBag.LoginUrl, null, viewDataDictionary)
+                    );
+                });
+            }
+            else
+            {
+                //Redirect
+                Uri url = new Uri(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp"));
+                string SchemeAndHost = url.Scheme + "://" + url.Authority;
+                string redirect = SchemeAndHost + HttpContext.Current.Request.Url.AbsolutePath;
+                //this.Url.Action(ViewBag.Action, ViewBag.Controller, (RouteValueDictionary)ViewBag.Params);
+                Response.Redirect(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+(string)ViewBag.LoginUrl+"?Result="+(userAut.Info.Replace("\n","").Replace("\r",""))+"&RedirectTo="+redirect+"&ctx="+CTX+"&e="+CTX);
+                //settings.ContentUrl = ViewBag.LoginUrl;
+            }
+        }
+    }
+}).GetHtml()
+@Html.DevExpress().DockZone(settings => {
+    settings.Name = "dockZone_"+ViewBag.Name;
+    settings.Height = Altura_dockPanel;
+    settings.Width = Largura_dockPanel;
+    if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+    {
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    }
+    //settings.Width = System.Web.UI.WebControls.Unit.Percentage(98.5);
+    settings.AllowGrowing = true;
+}).GetHtml()
+<script type="text/javascript">
+    @{ string PanelUIName = "dockPanel" + ViewBag.Name; }
+    function setDockPanelFill() {
+        var dockPanel = dockZone1.GetPanelByUID('@PanelUIName');
+        dockPanel.SetHeight(dockZone1.GetHeight()+20);
+        dockPanel.SetWidth(dockZone1.GetWidth());
+    }
+    $(document).ready(function () {
+        //AUTOSIZE FUNCTION
+        //alert('atualizando ' + '@PanelUIName');
+        //setDockPanelFill();
+    });
+</script>

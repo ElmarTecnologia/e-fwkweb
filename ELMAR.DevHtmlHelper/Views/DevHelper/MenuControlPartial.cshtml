@@ -1,0 +1,145 @@
+﻿@{
+    List<ELMAR.DevHtmlHelper.Models.Fwk_MenuItem> Menus = ViewBag.Menus;
+    System.Web.UI.WebControls.Unit Largura = 0;
+    string appName = ELMAR.DevHtmlHelper.Models.Util.ConvertToAlphaNumeric(System.Configuration.ConfigurationManager.AppSettings["appName"].ToString());
+    //string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX_LocalStorage(null, "CTX", true);
+    string CTX = ViewBag.CTX;
+    if (string.IsNullOrEmpty(CTX))
+    {
+        CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX(HttpContext.Current, "", "CTX", true);
+    }
+    if (ViewBag.Largura.Contains("%"))
+    {
+        Largura = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewBag.Largura.Replace("%", "")));
+    }
+    else
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Largura.Replace("px", "")));
+    }
+}
+
+@Html.DevExpress().Menu(settings =>
+{
+    settings.Name = ViewBag.Name;
+    settings.TextField = ViewBag.Name;
+    settings.Width = Largura;
+    settings.Style.Add("float", "left");
+    settings.Styles.Item.CssClass = settings.Styles.SubMenuItem.CssClass = "tm-execute"; //Microdata Tag Class
+    settings.Styles.Item.Font.Size = settings.Styles.SubMenu.Font.Size =
+    settings.Styles.SubMenuItem.Font.Size =
+    System.Web.UI.WebControls.FontUnit.Point(10);
+    if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+    {
+        //settings.Style.Add("font-size", "24px");
+        settings.Styles.Item.Font.Size = System.Web.UI.WebControls.FontUnit.Point(18);
+        settings.Styles.Item.ForeColor = System.Drawing.Color.Black;
+    }
+    //settings.Style.Add("font-weight", "bold");
+    settings.ItemImagePosition = ImagePosition.Left;
+    settings.EnableAdaptivity = true;
+    settings.SettingsAdaptivity.Enabled = true;
+    settings.SettingsAdaptivity.EnableAutoHideRootItems = true;
+    settings.SettingsAdaptivity.EnableCollapseToSideMenu = true;
+
+    foreach (var menuItem in Menus)
+    {
+        if ((menuItem.Pai == null || menuItem.Pai.ID == menuItem.ID) && menuItem.Visivel)
+        {
+            settings.Items.Add(item =>
+            {
+                item.Text = menuItem.Titulo;
+                RouteValueDictionary routeValues = new RouteValueDictionary();
+                routeValues.Add("Controller", menuItem.Controller);
+                routeValues.Add("Action", menuItem.Action);
+                routeValues.Add("e", CTX);
+                //Adicionando parâmetros dinâmicos
+                foreach (var param in (Dictionary<string, object>)ELMAR.DevHtmlHelper.Models.Core.GetRouteParameters(menuItem.RouteParameters, "ctx", CTX))
+                {
+                    if (routeValues.ContainsKey(param.Key))
+                        routeValues[param.Key] = param.Value;
+                    else
+                        routeValues.Add(param.Key, param.Value);
+                }
+                menuItem.RouteValueDictionary = routeValues;
+                //item.NavigateUrl = DevExpressHelper.GetUrl(routeValues);
+                item.Image.Url = menuItem.GroupImage;
+                item.Image.Height = System.Web.UI.WebControls.Unit.Pixel(30);
+                item.NavigateUrl = menuItem.NavUrl;
+                item.Image.Url = menuItem.IconUrl;
+                item.Image.Width = item.Image.Height = System.Web.UI.WebControls.Unit.Pixel(25);
+                //item.Image.Height = System.Web.UI.WebControls.Unit.Pixel(80);
+                item.ItemStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+                item.ItemStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+                item.ItemStyle.Font.Bold = true;
+                //item.ItemStyle.Width = System.Web.UI.WebControls.Unit.Pixel(130);
+                item.Enabled = menuItem.Ativo;
+                item.ToolTip = menuItem.ToolTip;
+                //Verificação de autorizações
+                if (menuItem.Ativo)
+                {
+                    ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = null;
+                    //ELMAR.DevHtmlHelper.Models.Usuario sessionUser = (ELMAR.DevHtmlHelper.Models.Usuario)Session["USUARIO"];
+                    item.Enabled = (!ViewBag.CheckAuthorization) ? true :
+                                    menuItem.Controller.Equals(string.Empty) ? true : ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + menuItem.Controller + "/" + menuItem.Action, HttpContext.Current, string.Empty);
+                    if (!string.IsNullOrEmpty(item.ToolTip))
+                        item.ToolTip += " - ";
+                    if (userAut != null)
+                        item.ToolTip += userAut.Info;
+                }
+                foreach (var submenuItem in Menus)
+                {                                                                                              //Evita adicionar o pai nos subitens
+                    if (submenuItem.Pai != null && submenuItem.Pai.ID == menuItem.ID && submenuItem.Visivel && submenuItem.ID != menuItem.Pai.ID)
+                    {
+                        if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+                        {
+                            item.NavigateUrl = ""; //Remove o link do menu PAI para o ambiente mobile
+                        }
+                        item.Items.Add(subItem =>
+                        {
+                            subItem.Text = submenuItem.Titulo;
+                            RouteValueDictionary routeValues2 = new RouteValueDictionary();
+                            //new { Controller = menuItem.Controller, Action = menuItem.Action, e = CTX };
+                            routeValues2.Add("Controller", submenuItem.Controller);
+                            routeValues2.Add("Action", submenuItem.Action);
+                            routeValues2.Add("e", CTX);
+                            //Adicionando parâmetros dinâmicos
+                            foreach (var param in ELMAR.DevHtmlHelper.Models.Core.GetRouteParameters(submenuItem.RouteParameters, "ctx", CTX))
+                            {
+                                if (routeValues2.ContainsKey(param.Key))
+                                    routeValues2[param.Key] = param.Value;
+                                else
+                                    routeValues2.Add(param.Key, param.Value);
+                            }
+                            //subItem.NavigateUrl = DevExpressHelper.GetUrl(routeValues2);
+                            //subItem.NavigateUrl = DevExpressHelper.GetUrl(new { Controller = submenuItem.Controller, Action = submenuItem.Action, e = CTX });
+                            submenuItem.RouteValueDictionary = routeValues2;
+                            subItem.NavigateUrl = submenuItem.NavUrl;
+                            subItem.Enabled = submenuItem.Ativo;
+                            subItem.ToolTip = submenuItem.ToolTip;
+                            subItem.ItemStyle.Font.Bold = true;
+                            if (submenuItem.Ativo)
+                            {
+                                ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = null;
+                                //ELMAR.DevHtmlHelper.Models.Usuario sessionUser = (ELMAR.DevHtmlHelper.Models.Usuario)Session["USUARIO"];
+                                subItem.Enabled = (!ViewBag.CheckAuthorization) ? true :
+                                                   ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + submenuItem.Controller + "/" + submenuItem.Action, HttpContext.Current, string.Empty);
+                                if (!string.IsNullOrEmpty(subItem.ToolTip))
+                                    subItem.ToolTip += " - ";
+                                if (userAut != null)
+                                    subItem.ToolTip += userAut.Info;
+                            }
+                            //subItem.Target = "_blank";
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    settings.Theme = (string)ViewBag.Tema;
+    settings.EnableTheming = true;
+    settings.Orientation = ((string)ViewBag.Orientacao).Equals("Vertical") ? System.Web.UI.WebControls.Orientation.Vertical : System.Web.UI.WebControls.Orientation.Horizontal;
+    settings.ClientSideEvents.ItemClick = "function(s, e) { if(e.item.GetNavigateUrl()!='') CallbackPanel.PerformCallback(); }";
+    //settings.ShowAsToolbar = false;
+
+}).GetHtml()

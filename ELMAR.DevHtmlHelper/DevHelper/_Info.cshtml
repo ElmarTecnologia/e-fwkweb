@@ -1,0 +1,4 @@
+﻿<p style="font-family:Arial;font-weight:bold;text-align:center">@ViewBag.Result</p>
+@if(!string.IsNullOrEmpty(ViewBag.Redirect)){
+    @Html.Action("Redirect", new { Url = ViewBag.Redirect });
+}

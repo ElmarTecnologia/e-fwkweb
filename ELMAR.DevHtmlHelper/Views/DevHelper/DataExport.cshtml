@@ -1,0 +1,94 @@
+﻿@if (!ViewBag.IsInternal)
+{
+    @Scripts.Render("~/Content/DevHelper/js")
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/Content/DevHelper/css")
+    @Styles.Render("~/Content/themes/base/css")
+    @Html.Partial("_ScriptsControlDevEx")
+}
+<script type="text/javascript">
+    try {
+        parent.LoadingPanel.Hide();
+    } catch{ }
+</script>
+@if (Model != null && Model is string && ((string)Model).StartsWith("Erro"))
+{
+    @Model
+    return;
+}
+@if (ViewBag.showUrl)
+{
+    <span style="font-weight:bold;width:800px;overflow:auto">[URL PARA INTEGRAÇÃO]</span>
+    <br />
+    @Html.TextArea("URLIntegra", (string)ViewBag.URL_Integra, new { style = "width:100%" });
+}
+@if (ViewBag.returnType.ToLower().Equals("grid"))
+{
+        @Html.Action("GridViewPartial", "DevHelper", new
+   {
+       dtSource = ViewData["dtSource_" + ViewBag.module],
+       sqlCode = ViewData["sqlCode_" + ViewBag.module],
+       gridName = ViewBag.module,
+       gridTitulo = ViewData["gridTitulo_" + ViewBag.module],
+       gridKey = ViewData["gridKey_" + ViewBag.module],
+       Tema = ViewData["Tema"],
+       tamPagina = ViewData["tamPagina_" + ViewBag.module],
+       ColunasOcultas = ViewData["ColunasOcultas_" + ViewBag.module],
+       ColunasLinks = ViewData["ColunasLinks_" + ViewBag.module],
+       Totalizadores = ViewData["Totalizadores_" + ViewBag.module],
+       ColunasCurrency = ViewData["ColunasCurrency_" + ViewBag.module],
+       Agrupadores = ViewData["Agrupadores_" + ViewBag.module],
+       Expanded = ViewData["Expanded_" + ViewBag.module],
+       ExibeExportador = ViewData["ExibeExportador_" + ViewBag.module],
+       ExibeAgrupador = ViewData["ExibeAgrupador_" + ViewBag.module],
+       ExibeLinhaFiltro = ViewData["ExibeLinhaFiltro_" + ViewBag.module],
+       DetailAction = ViewData["DetailAction_" + ViewBag.module],
+       ColunasActions = ViewData["ColunasActions_" + ViewBag.module],
+       InfoColunas = ViewData["InfoColunas_" + ViewBag.module],
+       Info = ViewData["Info_" + ViewBag.module],
+       ExportHeaderText = ViewData["ExportHeaderText_" + ViewBag.module],
+       CTX = ViewData["CTX_" + ViewBag.module],
+       autoScroll = true,
+       Largura = "100%"
+   })    
+}
+else
+{
+    TempData["fileContent_" + ViewBag.module] = Model;
+    <!--Não exibe o resultado-->
+    if (ViewBag.showResult)
+    {
+        @Model
+    }
+    else
+    {
+        <text>Dados gerados com êxito, clique no botão acima para salvar o arquivo.</text>
+        <hr />
+        <!-- Salvar Arquivo -->
+        @Html.DevExpress().Button(
+            settings =>
+            {
+                settings.Name = "btnSaveContent";
+                settings.Text = "Salvar Arquivo";
+                settings.EnableTheming = true;
+                settings.Theme = ViewBag.Tema;
+                settings.RouteValues = new
+                {
+                    Controller = "Fwk",
+                    Action = "DownloadTemp",
+                    file = ViewBag.module + "." + ViewBag.returnType.ToLower(),
+                    content = "fileContent_" + ViewBag.module
+                };
+            }).GetHtml();
+    }
+
+}
+<!-- MONTA FORMULÁRIO DE FILTRAGEM -->
+@if (ViewBag.showAutoForm && ViewBag.Filters != null && ((string[])ViewBag.Filters).Length > 0)
+{
+    <br />
+    <br /><strong><span>Formulário de Filtros</span></strong>
+    <br />
+    <br />
+    @Html.Partial("DevHelper/DataFormBuilder", (string)ViewData["CTX_" + ViewBag.module])
+}

@@ -1,0 +1,40 @@
+﻿@{
+    //Seleção do TEMA (Para o modo GRID)
+    string[] temas = new string[] {"Default", "DevEx", "Moderno", "Material", "MaterialCompact",
+"Mulberry", "Glass", "iOS", "Aqua", "BlackGlass", "MetropolisBlue", "Metropolis", "Youthful",
+"RedWine", "Office365", "Office2010Black", "Office2010Blue", "Office2010Silver", "Office2003Blue",
+"Office2003Olive", "Office2003Silver", "PlasticBlue", "SoftOrange"
+};
+}
+@if (Model != null && Model is string && ((string)Model).Equals("select"))
+{
+    <select name="Tema" style="width:225px;border-radius:3px;">
+        @{
+            string Tema = !string.IsNullOrEmpty(Request["Tema"]) ? Request["Tema"] : ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("DefaultTheme", Session);
+        }
+        @foreach (string item in temas)
+        {
+            string selected = (item.Equals(Tema)) ? "selected" : string.Empty;
+            string descTema = ELMAR.DevHtmlHelper.Models.Core.ParserInfo("Tema", item);
+            <option value="@item" @selected>@descTema</option>
+        }
+    </select>
+}
+else
+{
+    <form class="customForm" action="#" name="_seletorTemaView" method="get"
+          onsubmit="this.DXScript.value=''; this.DXCss.value=''; CallbackPanel.PerformCallback();">
+        <select name="Tema" style="width:225px;border-radius:3px;">
+            @{
+                string Tema = !string.IsNullOrEmpty(Request["Tema"]) ? Request["Tema"] : ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("DefaultTheme", Session);
+            }
+            @foreach (string item in temas)
+            {
+                string selected = (item.Equals(Tema)) ? "selected" : string.Empty;
+                string descTema = ELMAR.DevHtmlHelper.Models.Core.ParserInfo("Tema", item);
+                <option value="@item" @selected>@descTema</option>
+            }
+        </select>
+        <input type="submit" style="font-size:12px;height:19px;padding:2px;float:left;width:225px;margin-left:5px" value="Aplicar Tema" />
+    </form>
+}

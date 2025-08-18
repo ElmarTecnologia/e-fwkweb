@@ -1,0 +1,37 @@
+﻿<h4 style="color:#ff0000">@ViewBag.Result</h4>
+
+@using (Html.BeginForm("MailSender", "Fwk", FormMethod.Post, new { style="width:90%" }))
+{                              
+        @Html.Hidden("CRUDAction")
+        @Html.Hidden("RedirectTo", (string)ViewBag.RedirectTo)
+        <p>Enviar para Grupo:</p> 
+        @Html.DropDownList("grupo", new SelectList(ViewBag.Perfis, "Titulo", "Descricao"), "Nenhum", new { id = "selectPerfil" })            
+        <p>Emails:</p> 
+        @Html.TextArea("emails")
+        <p>Assunto:</p> 
+        @Html.TextBox("assunto")
+        <p>Mensagem:</p> 
+        @*Html.TextArea("mensagem")*@
+        @Html.Action("HtmlEditorPartial", "DevHelper", new { Name = "mensagem_Html", Tema = ViewBag.Tema });
+    <br /><br />
+    <input type="submit" value="ENVIAR MENSAGEM" onclick="$('#CRUDAction').val('SUBMIT')" title="ENVIAR MENSAGEM" />  
+}
+
+<!--JAVASCRIPT CONFIGURATION-->
+<!--<script type="text/javascript" src="@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)/Scripts/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript">
+        tinymce.init({
+                //selector: "textarea",
+                mode: "exact",
+                elements: "mensagem",
+                language: "pt_PT",
+                height: 300,
+                plugins: [
+                  'advlist autolink lists link image charmap print preview anchor',
+                  'searchreplace visualblocks code fullscreen',
+                  'insertdatetime media table contextmenu paste code'
+                ],
+                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                content_css: '@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)/Content/codepen.min.css'
+            });
+    </script>-->

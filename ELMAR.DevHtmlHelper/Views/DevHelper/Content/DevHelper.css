@@ -1,0 +1,378 @@
+﻿a {
+    text-decoration: none !important;
+}
+
+.dxtc-link{
+	background:#fff;
+}
+
+.ExportBox {
+    float: left;
+    position: relative;
+    padding: 5px;
+    background: #f4f4f4;
+    margin: 10px;
+    color: #777;
+}
+
+    .ExportBox label {
+        font-family: Verdana;
+        font-size: 12px;
+    }
+
+    .ExportBox input, .ExportBox button {
+        background: none;
+        width: 40px;
+    }
+
+.lbGroupBy {
+    float: left;
+    font-size: 12px;
+    width: 98%;
+    display: table;
+}
+
+.popupLink {
+    height: 21px;
+    position: relative;
+    float: left;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.popupLink2 {
+    width: 400px;
+    height: 30px;
+    position: relative;
+    left: 50%;
+    margin: 0 0 10px -200px;
+    text-align: center
+}
+
+    .popupLink a, .popupLink2 a {
+        float: left;
+        margin-right: 5px;
+        font-size: 11px;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+.customForm label {
+    /*border-bottom: 1px solid #ccc;
+        border-radius: 4px;*/
+    font-weight: bold;
+    float: left;
+    width: 100%;
+}
+
+.customForm span {
+    float: left;
+}
+
+.customForm label span {
+    float: unset;
+}
+
+.customForm input[type=text], .customForm input[type=password], .customForm select,
+.customForm input[type=radio], .customForm textarea {
+    border: 1px solid #ccc;
+    /*border-radius: 4px;*/
+    float: left;
+    display: block;
+    padding: 2px;
+    margin: 5px;
+}
+
+.customForm input[type=submit],
+.customForm input[type=button],
+.customForm submit {
+    background-color: #888;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: left;
+}
+
+.customForm .btn-default {
+    margin: 0;
+}
+
+.btn-default {
+    margin: 10px;
+}
+
+.customForm input[type=submit]:hover {
+    background-color: #bbb;
+    color: #000;
+}
+
+fieldset {
+    font-family: sans-serif;
+    border: none;
+    border-top: 2px solid #555;
+    background: none;
+    padding: 5px;
+    float: left;
+    width: 100%;
+}
+
+    fieldset legend {
+        background-color: #555;
+        padding: 5px 10px 5px 10px;
+        color: white;
+        border-radius: 5px;
+        border: 2px none #eeece1;
+        font-size: 16px;
+    }
+
+    fieldset ol {
+        padding: 0;
+        list-style: none;
+    }
+
+        fieldset ol li {
+            padding-bottom: 5px;
+        }
+
+.gridViewGroupBy {
+    height: 25px;
+}
+
+#gridTable, .gridTable {
+    width: 100%;
+}
+
+    #gridTable tr td, .gridTable tr td, #gridTable th, .gridTable th {
+        border: solid 1px #ddd;
+        text-align: left;
+        padding: 5px;
+    }
+
+.popupLinkDiv {
+    position: relative;
+    text-align: center;
+    font-weight: bold;
+    float: left;
+}
+
+    .popupLinkDiv img {
+        height: 21px;
+    }
+
+    .popupLinkDiv a, .popupLink a, .popupLink {
+        font-size: 13px;
+        font-weight: bold;
+        border: 1px outset #ccc;
+        border: none;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        text-decoration: none;
+    }
+
+.popupLink {
+    font-size: 14px;
+}
+
+a.dxtc-link {
+    z-index: 400;
+    position: relative;
+    float: left;
+}
+
+/*Layout Padrão*/
+.divOperations, .divOperationsPanel {
+    padding: 5px;
+    width: 98%;
+    display: table;
+}
+
+#searchMenu {
+    min-height: 107px;
+}
+
+.divMenu .full #searchMenu {
+    min-height: 0;
+}
+
+.divMenu {
+    float: left;
+    width: 18%;
+    height: auto;
+    overflow: hidden;    
+    margin: 0;
+	background:#f4f4f4;
+}
+
+    .divMenu.full {
+        width: 100%;
+        overflow: hidden;
+    }
+
+.divCenter {
+    float: left;
+    width: 72%;
+    padding: 5px;
+    min-height: 400px;
+    background: none;
+    border: none;
+    margin-bottom: 40px;
+    background: #fff;
+    overflow: auto;
+}
+
+    .divCenter.full {
+        width: 92%;
+        padding: 40px;
+        overflow-y: hidden;
+    }
+
+.divCenter2 {
+    float: left;
+    width: 81%;
+    height: 100%;
+    background: #fff;
+    padding: 0 0 50px 0.5%;
+    /*border-left: 1px solid #bbb;*/
+}
+
+    .divCenter2.full {
+        width: 99%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: auto;
+    }
+
+.divRight, .divLeft {
+    float: left;
+    width: 8%;
+    margin: 10px 0px 10px 0px;
+    padding: 15px 10px 0 10px;
+    padding-bottom: 20px;
+}
+
+    .divRight.full, .divLeft.full {
+        width: 97%;
+    }
+
+.contentPanelFwkLogin {
+    width: 210px;
+    left: 50%;
+    position: relative;
+    margin-left: -115px;
+    float: left;
+    display: table;
+    border: double 1px #000;
+    border-radius: 2px;
+    background: #f4f4f4;
+    padding: 10px 25px 10px 10px;
+}
+
+.separator {
+    height: 20px;
+    width: 100%;
+    display: table;
+}
+
+.messageLabel {
+    color: #ff0000;
+}
+
+#GroupBy_logPortalGRID {
+    border:none !important;
+}
+
+@media print {
+    /* Hide everything in the body when printing... */
+    body .printing * {
+        display: none;
+    }
+    /* ...except our special div. */
+    body.printing #print-me {
+        display: block;
+    }
+
+    body.printing .hideHeader {
+        display: none;
+    }
+}
+
+@media screen {
+    /* Hide the special layer from the screen. */
+    #print-me., .print-me {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 720px) {
+    .divMenu, .divCenter, .divCenter2, .divLeft, .divRight, .divCenter2.full, .divCenter.full {
+        width: 98%;
+        height: auto;
+        margin: 0;
+        padding: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border: none;
+    }
+
+        .divMenu.full {
+            width: 100%;
+            overflow: hidden;
+        }
+
+    .divCenter, .divCenter2 {
+        background: none;
+    }
+
+    .divOperationsPanel {
+        width: 220px;
+        float: left;
+        position: relative;
+        left: 50%;
+        margin-left: -110px;
+    }
+
+    .customForm,
+    .divOperations {
+        float: left;
+        width: 99%;
+        height: auto;
+        padding: 10px;
+        font-size: 18px;
+        display: block;
+        overflow-x: hidden !important;
+    }
+
+        .customForm input[type=text],
+        .customForm input[type=password],
+        .customForm select, .customForm.selectControl,
+        .customForm input[type=submit],
+        .customForm input[type=button],
+        .selectControl, .customForm textarea, .customForm label, fieldset {
+            display: block;
+            overflow: hidden;                        
+            font-size: 20px;
+        }
+
+        .customForm input[type=submit],
+        .customForm input[type=button] {
+            margin-bottom: 10px;
+            width: auto;
+            padding: 4px;
+        }
+
+        .customForm span {
+            float: left;
+        }
+
+    .subTitulo {
+        width: 60%;
+    }
+
+    .gridViewGroupBy, .gridViewGroupBy select {
+        min-width: 80%;
+        display: table;
+    }
+}

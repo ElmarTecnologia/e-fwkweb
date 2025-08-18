@@ -1,0 +1,92 @@
+﻿@{  
+    ViewBag.Title = "Index";  
+}  
+  
+  
+  
+@section scripts{  
+      
+    <!-- CSS -->  
+    <link href="~/Content/jqx.base.css" rel="stylesheet" />  
+    <!-- JS -->  
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>  
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>  
+    <script src="~/Scripts/jqxcore.js"></script>  
+    <script src="~/Scripts/jqxdata.js"></script>  
+    <script src="~/Scripts/jqxbuttons.js"></script>  
+    <script src="~/Scripts/jqxcheckbox.js"></script>  
+    <script src="~/Scripts/jqxgrid.js"></script>  
+    <script src="~/Scripts/jqxgrid.selection.js"></script>  
+    <script src="~/Scripts/jqxmenu.js"></script>  
+    <script src="~/Scripts/jqxscrollbar.js"></script>  
+    <script src="~/Scripts/jqxgrid.sort.js"></script>  
+    <script src="~/Scripts/jqxgrid.columnsresize.js"></script>  
+    <script src="~/Scripts/jqxangular.js"></script>  
+    <script src="~/Scripts/demos.js"></script>  
+  
+    <script type="text/javascript">  
+  
+    var app = angular.module('myApp', ['jqwidgets']);  
+    app.controller('GridCtrl', function ($scope, $http) {  
+  
+        $scope.createWidget = false;  
+        $http({  
+  
+            method: 'GET',  
+            url: 'GetCustomers'  
+        }).success(function (data, status) {  
+  
+            // prepare the data  
+            var source = {  
+  
+                datatype: "json",  
+                datafields: [  
+                    { name: 'CustomerID', type: 'int' },  
+                    { name: 'CustomerName', type: 'string' },  
+                    { name: 'CustomerEmail', type: 'string' },  
+                    { name: 'CustomerZipCode', type: 'int' },  
+                    { name: 'CustomerCountry', type: 'string' },  
+                    { name: 'CustomerCity', type: 'string' }  
+                ],  
+                id: 'id',  
+                localdata: data  
+            };  
+  
+            var dataAdapter = new $.jqx.dataAdapter(source);  
+            $scope.gridSettings =  
+            {  
+                width: 950,  
+                source: dataAdapter,  
+                columnsresize: true,  
+  
+                columns: [  
+                    { text: 'Customer ID', datafield: 'CustomerID', width: 250 },  
+                    { text: 'Customer Name', datafield: 'CustomerName', width: 250 },  
+                    { text: 'Customer Email', datafield: 'CustomerEmail', width: 250 },  
+                    { text: 'Customer ZipCode', datafield: 'CustomerZipCode', width: 250 },  
+                    { text: 'Customer Country', datafield: 'CustomerCountry', width: 250 },  
+                    { text: 'Customer City', datafield: 'CustomerCity', width: 250 }  
+  
+                ]  
+  
+            };  
+            //now create the widget.  
+            $scope.createWidget = true;  
+  
+        }).error(function (data, status) {  
+  
+            console.log('Something Wrong');  
+        });  
+  
+    });  
+  
+  
+</script>  
+      
+    }   
+  
+<h2>AngularJS Grid Binding To JSON</h2>  
+  
+<div ng-app="myApp" ng-controller="GridCtrl">  
+    <jqx-grid jqx-create="createWidget" jqx-settings="gridSettings"></jqx-grid>  
+</div>  

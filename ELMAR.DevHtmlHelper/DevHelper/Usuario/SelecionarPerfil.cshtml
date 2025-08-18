@@ -1,0 +1,6 @@
+﻿@using (Html.BeginForm("SelecionarPerfilAction", "Usuario", FormMethod.Post, new { @class="customForm"} ))
+{
+    @Html.Hidden("RedirectTo", ViewData["RedirectTo"])
+    @Html.DropDownList("Perfil", new SelectList(ViewBag.Perfis, "Titulo", "Titulo", Session["PERFIL"].ToString()))     
+    <input type="submit" value="Acessar"/>  
+}

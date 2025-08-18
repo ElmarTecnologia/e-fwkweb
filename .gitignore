@@ -1,0 +1,14 @@
+/ELMAR.DevHtmlHelper/bin
+/Elmar.WebServiceRest/bin
+/Elmar.WcfServiceRestful/bin/Debug
+/ELMAR.DevHtmlHelper/obj/Debug
+/ELMAR.DevHtmlHelper/obj/Release
+/Elmar.WebServiceRest/obj/Debug
+/Elmar.WcfServiceRestful/obj/Debug
+/Elmar.WebServiceRest/obj/Release
+/publish/Content
+/publish
+/.vs/config
+/.vs/Elmar.WebServiceRest/v15/Server/sqlite3
+/.vs/Elmar.WebServiceRest/v15
+/.vs/Elmar.WebServiceRest/DesignTimeBuild

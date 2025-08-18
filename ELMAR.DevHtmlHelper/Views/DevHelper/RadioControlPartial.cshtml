@@ -1,0 +1,26 @@
+﻿@Html.Hidden((string)ViewBag.Name, (string)ViewBag.SelectedItems, new { id = (string)ViewBag.Name })
+@Html.DevExpress().RadioButtonList(
+    settings =>
+    {
+        settings.Theme = ViewBag.Tema;
+        settings.EnableTheming = true;
+        settings.Name = ViewBag.Name + "_radiolistbox";
+        settings.Properties.ValueField = ViewBag.Key;
+        settings.Properties.TextField = ViewBag.Value;
+        settings.Properties.RepeatLayout = System.Web.UI.WebControls.RepeatLayout.Table;
+        settings.Properties.RepeatDirection = System.Web.UI.WebControls.RepeatDirection.Horizontal;
+        settings.Enabled = (bool)ViewBag.Enabled;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(70);
+        settings.Properties.RepeatColumns = !ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request) ? (int)ViewBag.QtdColunas : 1;
+        settings.PreRender = (sender, e) => {
+            List<string> values = ((string)ViewBag.SelectedItems).Split(',').ToList<string>();
+            ASPxRadioButtonList cbl = (ASPxRadioButtonList)sender;
+            foreach(ListEditItem item in cbl.Items) {
+                if(values.Contains(item.Value))
+                    item.Selected = true;
+            }
+        };
+        //settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) {alert(s.GetSelectedValues());}";
+        //settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) {$('#"+ViewBag.Name+"').val(s.GetSelectedValues());}";
+        settings.Properties.ClientSideEvents.SelectedIndexChanged = "function(s, e) {document.getElementById('" + ViewBag.Name + "').value=s.GetValue(); }";
+    }).BindList(Model).GetHtml()

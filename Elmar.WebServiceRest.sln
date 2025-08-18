@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELMAR.DevHtmlHelper", "ELMAR.DevHtmlHelper\ELMAR.DevHtmlHelper.csproj", "{EAD6463C-4291-4716-88A7-5BFD848E567F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elmar.WebServiceRest", "Elmar.WebServiceRest\Elmar.WebServiceRest.csproj", "{E930A800-C87C-4079-907C-04E76CFEE12B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAD6463C-4291-4716-88A7-5BFD848E567F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAD6463C-4291-4716-88A7-5BFD848E567F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAD6463C-4291-4716-88A7-5BFD848E567F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAD6463C-4291-4716-88A7-5BFD848E567F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E930A800-C87C-4079-907C-04E76CFEE12B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E930A800-C87C-4079-907C-04E76CFEE12B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E930A800-C87C-4079-907C-04E76CFEE12B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E930A800-C87C-4079-907C-04E76CFEE12B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

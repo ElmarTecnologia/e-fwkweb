@@ -1,0 +1,190 @@
+﻿@{
+    bool Enabled = true;
+    ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = new ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao();
+    string EnabledStyle = string.Empty;
+    //Tratamento para a unidade das dimensões do painel
+    System.Web.UI.WebControls.Unit Altura = 0;
+    System.Web.UI.WebControls.Unit Largura = 0;
+    //string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX_LocalStorage(null, "CTX", true);
+    //string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCookie(HttpContext.Current, "", "CTX", true);
+    string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX(Context);
+
+    if (ViewBag.Altura.Contains("%"))
+    {
+        Altura = System.Web.UI.WebControls.Unit.Percentage(int.Parse(ViewBag.Altura.Replace("%", "")));
+    }
+    else
+    {
+        Altura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Altura.Replace("px", "")));
+    }
+    if (ViewBag.Largura.Contains("%"))
+    {
+        Largura = System.Web.UI.WebControls.Unit.Percentage(int.Parse(ViewBag.Largura.Replace("%", "")));
+    }
+    else
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Largura.Replace("px", "")));
+    }
+
+    string UIName = "popupControl" + ViewBag.Name;
+    string UIElementID = "linkPopup_" + ViewBag.Name;
+    //string parentComponent = (string)ViewBag.parentComponent;
+}
+@Html.DevExpress().PopupControl(settings =>
+{
+    settings.Name = UIName;
+    settings.PopupElementID = UIElementID;
+    settings.EnableClientSideAPI = true;
+    settings.AllowDragging = true;
+    settings.ShowOnPageLoad = ViewBag.isMessageBox ? true : ViewBag.ShowOnPageLoad;
+    settings.ShowCloseButton = true;
+    //settings.CloseAction = ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request) ? CloseAction.CloseButton : CloseAction.OuterMouseClick;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.HeaderText = (string)ViewBag.Titulo;
+    settings.Height = Altura;
+    settings.Width = Largura;
+    settings.AutoUpdatePosition = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    //settings.PopupVerticalAlign = ViewBag.isMessageBox ? PopupVerticalAlign.Above : PopupVerticalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.Middle;
+    settings.Theme = ViewBag.Tema;
+    settings.EnableTheming = true;
+    //settings.ScrollBars = ((bool)ViewBag.isMessageBox || !(bool)ViewBag.autoScroll) ? System.Web.UI.WebControls.ScrollBars.None : System.Web.UI.WebControls.ScrollBars.Vertical;
+    settings.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+    settings.Modal = true;
+    settings.SettingsLoadingPanel.Text = "Carregando, por favor, aguarde...";
+    //settings.ShowPageScrollbarWhenModal = true;
+    settings.ShowHeader = true;
+    settings.SettingsAdaptivity.Mode = PopupControlAdaptivityMode.OnWindowInnerWidth;
+    //settings.SettingsAdaptivity.CollapseAtWindowInnerWidth = 800;
+    settings.SettingsAdaptivity.VerticalAlign = PopupAdaptiveVerticalAlign.WindowTop;
+    settings.SettingsAdaptivity.MaxWidth = System.Web.UI.WebControls.Unit.Pixel(650);
+    settings.SettingsAdaptivity.MinHeight = Altura.Value >= 650 ? System.Web.UI.WebControls.Unit.Pixel(650) : Altura;
+
+    //settings.ShowCollapseButton = true;
+    //settings.EnableHotTrack = true;
+    if (ViewBag.autoRefresh)
+    {
+        settings.ClientSideEvents.CloseButtonClick = "function(s, e){ " + ViewBag.parentComponent + ".PerformCallback({ 'customGrouping':'false', 'reloadData':'true' }); " + settings.Name + ".Hide(); }";
+    }
+    if (!string.IsNullOrEmpty(ViewBag.Url))
+    {
+        settings.ContentUrl = ViewBag.Url;
+        //settings.Style.Add("overflow", "hidden");
+    }
+    else if (!string.IsNullOrEmpty(ViewBag.PViewName))
+    {
+        settings.LoadContentViaCallback = LoadContentViaCallback.OnFirstShow;
+        settings.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                Html.Partial((string)ViewBag.PViewName)
+            );
+            @Html.DevExpress().Button(btn_settings1 =>
+            {
+                btn_settings1.Style.Add("bottom", "0");
+                btn_settings1.Style.Add("margin-top", "30px");
+                btn_settings1.Style.Add("position", "absolute");
+                btn_settings1.Name = "btnClose1_" + settings.Name;
+                btn_settings1.Width = 90;
+                btn_settings1.Height = 25;
+                btn_settings1.Text = "FECHAR";
+                btn_settings1.Styles.Native = true;
+                btn_settings1.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".Hide(); }";
+            }).Render();
+        });
+    }
+    else if (!string.IsNullOrEmpty(ViewBag.HtmlContent))
+    {
+        string htmlContent = ViewBag.HtmlContent;
+        settings.SetContent(() =>
+        {
+            ViewContext.Writer.Write(
+                htmlContent + "<br />"
+            );
+            @Html.DevExpress().Button(btn_settings1 =>
+            {
+                btn_settings1.Style.Add("bottom", "0");
+                btn_settings1.Style.Add("margin-top", "30px");
+                btn_settings1.Style.Add("position", "absolute");
+                btn_settings1.Name = "btnClose1_" + settings.Name;
+                btn_settings1.Width = 90;
+                btn_settings1.Height = 25;
+                btn_settings1.Text = "FECHAR";
+                btn_settings1.Styles.Native = true;
+                btn_settings1.ClientSideEvents.Click = "function(s, e){ " + settings.Name + ".Hide(); }";
+            }).Render();
+        });
+    }
+    else
+    {
+        //Link obtido a partir do Controller e Action
+        #region Autoriza a chamada
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, string.Empty);
+        if (!Enabled)
+        {
+            EnabledStyle = "background:#bbb";
+        }
+        #endregion
+        //Padrão de abertura via Callback
+        RouteValueDictionary RouteParamsCallbackValues = (RouteValueDictionary)ViewBag.Params;
+        //Não utilizar RedirectoToAction entre as ações dos controladores (Impede o carregamento dentro do popup)
+        if (!RouteParamsCallbackValues.ContainsKey("Controller"))
+            RouteParamsCallbackValues.Add("Controller", ViewBag.Controller);
+        if (!RouteParamsCallbackValues.ContainsKey("Action"))
+            RouteParamsCallbackValues.Add("Action", ViewBag.Action);
+        if (!(bool)ViewBag.OpenInFrame /*&& !ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request)*/)
+        {
+            RouteParamsCallbackValues.Add("UITarget", settings.Name);
+            settings.LoadContentViaCallback = LoadContentViaCallback.OnFirstShow;
+            settings.CallbackRouteValues = RouteParamsCallbackValues;
+            /*settings.SetFooterTemplateContent(c =>
+            {
+                Html.DevExpress().Button(buttonsettings =>
+                {
+                    buttonsettings.Name = "updateButton_"+ settings.Name;
+                    buttonsettings.Text = "ATUALIZAR";
+                    buttonsettings.Style.Add("color", "#000");
+                    buttonsettings.ClientSideEvents.Click = "function(s, e) { "+ settings.Name + ".PerformCallback(); }";
+                }).Render();
+            });*/
+        }
+        else
+        {
+            ViewBag.Url = this.Url.Action(ViewBag.Action, ViewBag.Controller, (RouteValueDictionary)ViewBag.Params);
+            settings.ContentUrl = ViewBag.Url.Contains("?") && !ViewBag.Url.Contains("isPartial") ? ViewBag.Url + "&isPartial=true" : !ViewBag.Url.Contains("isPartial") ? ViewBag.Url + "?isPartial=true" : "";
+            //Adiciona o contexto da aplicação
+            settings.ContentUrl += "&ctx=" + CTX;
+        }
+    }
+    settings.ClientSideEvents.BeginCallback = "function(s, e){ e.customArgs['isPartial'] = true; e.customArgs['selectedIDs'] = selectedIDs; e.customArgs['ctx'] = '" + CTX + "' }";
+    settings.SettingsLoadingPanel.Enabled = true;
+    settings.SettingsLoadingPanel.ShowImage = true;
+    settings.PopupVerticalOffset = -20;
+    settings.Style.Add("position", "absolute");
+    settings.Style.Add("z-index", "99999");
+    //settings.ShowFooter = true;
+}).GetHtml()
+@*LINK PERSONALIZADO*@
+@if (!string.IsNullOrEmpty(ViewBag.Icon) || !string.IsNullOrEmpty(ViewBag.Link) || !string.IsNullOrEmpty(ViewBag.TextLink))
+{
+    <div id="popupLinkDiv" class="popupLinkDiv" style="@EnabledStyle">
+        @if (Enabled)
+        {
+            @ViewBag.TextLink<a href="#" onclick="@{@UIName}.BringToFront(); @{@UIName}.PerformCallback();" class="popupLink" id="@UIElementID" title="@ViewBag.LinkTip">
+                @if (!string.IsNullOrEmpty(ViewBag.Icon))
+                {
+                    @ViewBag.Link<img height="21" src="@ViewBag.Icon" title="@ViewBag.LinkTip" />
+                }
+                else
+                {
+                    @Html.Raw(ViewBag.Link)
+                }
+            </a>
+        }
+        else
+        {
+            @ViewBag.TextLink<img src="@ViewBag.Icon" title="@userAut.Info" />
+        }
+    </div>
+}

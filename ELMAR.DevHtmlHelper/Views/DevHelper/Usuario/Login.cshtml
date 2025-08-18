@@ -1,0 +1,28 @@
+﻿@{
+    //Repassando parâmetros para PartialView (LoginPartial)
+    RouteValueDictionary Params1 = new RouteValueDictionary();
+    Params1.Add("RedirectTo", ViewBag.RedirectTo);
+    Params1.Add("Msg", ViewBag.Msg);
+    Params1.Add("ReenviaSenha", ViewBag.ReenviaSenha);
+    Params1.Add("PreLogin", ViewBag.PreLogin);
+    Params1.Add("Perfil", ViewData["Perfil"]);    
+    Params1.Add("Codigo", ViewData["Codigo"]);
+    Params1.Add("Login", ViewData["Login"]);
+    Params1.Add("Email", ViewData["Email"]);
+    Params1.Add("UITarget", ViewData["UITarget"]);
+}
+<div class="contentPanelFwkLogin">
+@Html.Partial("DevHelper/Usuario/LoginPartial")
+@*Html.Action("DockPanelPartial", "DevHelper", new
+{
+    Name = "contentPanelFwkLogin",
+    PViewName = "DevHelper/Usuario/LoginPartial",
+    Params = Params1,
+    Titulo = "Login",
+    //Controller = "Usuario",
+    //Action = "Login",
+    Tema = ViewBag.Tema,
+    Altura = "320px",
+    Largura = "110%"
+})*@
+</div>

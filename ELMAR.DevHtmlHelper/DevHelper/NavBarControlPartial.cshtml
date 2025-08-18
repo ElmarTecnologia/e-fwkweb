@@ -1,0 +1,145 @@
+﻿@{
+    List<ELMAR.DevHtmlHelper.Models.Fwk_MenuItem> Menus = ViewBag.Menus;
+    //string CTX = ELMAR.DevHtmlHelper.Models.Core.GetSetCTX_LocalStorage(null, "CTX", true);
+    string CTX = ViewBag.CTX;    
+    //Adiciona o Item de Menu padrão "Menu" para Pai nulo
+    foreach (var item in Menus)
+    {
+        if (item.Pai == null)
+        {
+            ELMAR.DevHtmlHelper.Models.Fwk_MenuItem newMenuItem = new ELMAR.DevHtmlHelper.Models.Fwk_MenuItem()
+            {
+                ID = "#0#",
+                Titulo = "Menu",
+                Controller = "",
+                Action = "",
+                Ativo = true,
+                Visivel = true
+            };
+            item.Pai = newMenuItem;
+        }
+    }
+    System.Web.UI.WebControls.Unit Largura = 0;
+    if (ViewBag.Largura.Contains("%"))
+    {
+        Largura = System.Web.UI.WebControls.Unit.Percentage(double.Parse(ViewBag.Largura.Replace("%", "")));
+    }
+    else
+    {
+        Largura = System.Web.UI.WebControls.Unit.Pixel(int.Parse(ViewBag.Largura.Replace("px", "")));
+    }
+}
+
+@Html.DevExpress().NavBar(settings =>
+{
+    settings.Name = ViewBag.Name;
+    settings.Width = Largura;
+    settings.Theme = ViewBag.Tema;
+    settings.EnableTheming = true;
+    settings.AutoCollapse = !(bool)ViewBag.Expanded;
+    settings.Styles.Item.Font.Size = System.Web.UI.WebControls.FontUnit.Point(9);
+    settings.Styles.Item.CssClass = "tm-execute"; //Microdata Tag Class
+    settings.ClientSideEvents.ItemClick = "function(s, e) { if(e.item.GetNavigateUrl()!='') CallbackPanel.PerformCallback(); }";
+    settings.ClientSideEvents.HeaderClick = "function(s, e) { if(e.group.name != '') CallbackPanel.PerformCallback(); e.group.Expanded = !e.group.Expanded; }";
+    if (ViewBag.Tema != null && ((string)ViewBag.Tema).Equals("iOS"))
+        settings.Styles.Item.Font.Size = System.Web.UI.WebControls.FontUnit.Point(8);
+    if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+    {
+        settings.Styles.Item.Font.Size = settings.Styles.GroupContent.Font.Size = System.Web.UI.WebControls.FontUnit.Point(18);
+    }
+    foreach (var itemGrupo in Menus)
+    {
+        if (itemGrupo.Pai != null)
+        {
+            bool added = false;
+            foreach (var item in settings.Groups)
+            {
+                if (((MVCxNavBarGroup)item).Text.Equals(itemGrupo.Pai.Titulo))
+                {
+                    added = true;
+                    break;
+                }
+            }
+            if (added) continue;
+            //Adicionando grupos
+            settings.Groups.Add(group =>
+            {
+                group.Text = itemGrupo.Pai.Titulo;
+                group.HeaderImage.Url = itemGrupo.Pai.GroupImage;
+                group.HeaderStyle.ImageSpacing = 0;
+                group.HeaderImage.Height = System.Web.UI.WebControls.Unit.Pixel(30);
+                group.ItemStyle.Font.Size = group.HeaderStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(10);
+                if (ViewBag.Tema != null && ((string)ViewBag.Tema).Equals("iOS"))
+                {
+                    group.ItemStyle.Font.Size = group.HeaderStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(9);
+                }
+                int qtdItens = 0;
+                foreach (var itemNav in Menus)
+                {
+                    if (itemNav.Pai != null && itemNav.Visivel && itemNav.Pai.ID.Equals(itemGrupo.Pai.ID) && !itemNav.ID.Equals(itemNav.Pai.ID))
+                    {
+                        qtdItens++;
+                        RouteValueDictionary routeValues = new RouteValueDictionary();
+                        routeValues.Add("Controller", itemNav.Controller);
+                        routeValues.Add("Action", itemNav.Action);
+                        routeValues.Add("e", CTX);
+                        routeValues.Add("ctx", CTX);
+                        //Adicionando parâmetros dinâmicos
+                        foreach (var param in ELMAR.DevHtmlHelper.Models.Core.GetRouteParameters(itemNav.RouteParameters, "ctx", CTX))
+                        {
+                            if (routeValues.ContainsKey(param.Key))
+                                routeValues[param.Key] = param.Value;
+                            else
+                                routeValues.Add(param.Key, param.Value);
+                        }
+                        //Adicionando itens ao grupo
+                        itemNav.RouteValueDictionary = routeValues;
+                        group.Items.Add(itemNav.Titulo, "", itemNav.IconUrl, itemNav.NavUrl /*DevExpressHelper.GetUrl(routeValues)*/);
+                        //Visibilidade
+                        group.Items[group.Items.Count - 1].Visible = itemNav.Visivel;
+                        //Ativação
+                        group.Items[group.Items.Count - 1].Enabled = itemNav.Ativo;
+                        group.ItemStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(10);
+                        if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+                        {
+                            group.ItemStyle.Font.Size = System.Web.UI.WebControls.FontUnit.Point(20);
+                        }
+                        //Checagem de autorização
+                        if (itemNav.Ativo)
+                        {
+                            ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = null;
+                            group.Items[group.Items.Count - 1].Enabled = (!ViewBag.CheckAuthorization) ? true :
+                                ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + itemNav.Controller + "/" + itemNav.Action, HttpContext.Current, string.Empty);
+                            if (!string.IsNullOrEmpty(itemNav.ToolTip))
+                                itemNav.ToolTip += " - ";
+                            itemNav.ToolTip += userAut != null ? userAut.Info : string.Empty;
+                        }
+                    }
+                }
+                group.Name = qtdItens == 0 ? itemGrupo.Titulo : "";
+
+                RouteValueDictionary routeValuesItemG = new RouteValueDictionary();
+                routeValuesItemG.Add("Controller", itemGrupo.Controller);
+                routeValuesItemG.Add("Action", itemGrupo.Action);
+                routeValuesItemG.Add("e", CTX);
+                //routeValuesItemG.Add("ctx", CTX);
+                //Adicionando parâmetros dinâmicos
+                foreach (var param in ELMAR.DevHtmlHelper.Models.Core.GetRouteParameters(itemGrupo.RouteParameters, "ctx", CTX))
+                {
+                    if (routeValuesItemG.ContainsKey(param.Key))
+                        routeValuesItemG[param.Key] = param.Value;
+                    else
+                        routeValuesItemG.Add(param.Key, param.Value);
+                }
+                //Adicionando itens ao grupo
+                itemGrupo.RouteValueDictionary = routeValuesItemG;
+                group.NavigateUrl = qtdItens == 0 ? itemGrupo.NavUrl : string.Empty;
+                //Microdata Tag Class
+                if (ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps.ContainsKey(itemGrupo.Titulo.ToLower()))
+                {
+                    group.HeaderStyle.CssClass = ELMAR.DevHtmlHelper.Helpers.TurmalinaTags.dicItemProps[itemGrupo.Titulo.ToLower()][itemGrupo.Titulo.ToLower()];
+                }
+            });
+        }
+    }
+}).GetHtml()

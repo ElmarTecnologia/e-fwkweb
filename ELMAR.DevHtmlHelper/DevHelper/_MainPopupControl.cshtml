@@ -1,0 +1,35 @@
+﻿@{
+    System.Web.UI.WebControls.Unit Altura = System.Web.UI.WebControls.Unit.Pixel(520);
+    System.Web.UI.WebControls.Unit Largura = System.Web.UI.WebControls.Unit.Pixel(940);
+    string ModelName = (string)Model;
+    string UIName = "_mainpopup_" + ModelName;
+}
+@Html.DevExpress().PopupControl(settings =>
+{
+    settings.Name = UIName;
+    settings.PopupElementID = UIName;
+    settings.AllowDragging = true;
+    settings.AllowResize = true;
+    settings.Theme = ViewBag.Tema;
+    settings.EnableTheming = true;
+    settings.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+    settings.Modal = true;
+    settings.HeaderText = "";
+    //settings.ShowHeader = true;
+    settings.AutoUpdatePosition = true;
+    settings.PopupHorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.PopupVerticalAlign = PopupVerticalAlign.Above;
+    //settings.EnableHotTrack = true;
+    settings.Height = Altura;
+    settings.Width = Largura;
+    settings.ContentUrl = "javascript:void(0);";
+    settings.SettingsAdaptivity.Mode = PopupControlAdaptivityMode.OnWindowInnerWidth;
+    settings.SettingsAdaptivity.VerticalAlign = PopupAdaptiveVerticalAlign.WindowTop;
+    settings.SettingsAdaptivity.MaxWidth = System.Web.UI.WebControls.Unit.Pixel(650);
+    settings.SettingsAdaptivity.MinHeight = Altura.Value >= 650 ? System.Web.UI.WebControls.Unit.Pixel(650) : Altura;
+    //settings.CloseAction = ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request) ? CloseAction.CloseButton : CloseAction.OuterMouseClick;
+    settings.CloseAction = CloseAction.CloseButton;
+    settings.ClientSideEvents.Init = "OnPopupInit";
+    settings.ClientSideEvents.Shown = "OnPopupShown";
+    settings.ClientSideEvents.CloseButtonClick = "function(s, e){ " + ModelName + ".PerformCallback({ 'customGrouping':'false', 'reloadData':'true' }); " + settings.Name + ".Hide(); showPopup = false; }";
+}).GetHtml()

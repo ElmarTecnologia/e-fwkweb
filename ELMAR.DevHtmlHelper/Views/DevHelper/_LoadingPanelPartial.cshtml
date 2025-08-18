@@ -1,0 +1,64 @@
+﻿@{
+    string UIName = "";
+    if (Model != null && Model is string)
+    {
+        UIName = (string)Model;
+    }
+}
+
+@Html.DevExpress().CallbackPanel(
+    settings =>
+    {
+        settings.Name = "CallbackPanel" + UIName;
+        //settings.CallbackRouteValues = new { Controller = "DevHelper", Action = "LoadingPartial" };
+        settings.SettingsLoadingPanel.ShowImage = false;
+        settings.ControlStyle.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        settings.SettingsLoadingPanel.Text = (!string.IsNullOrEmpty(ViewBag.LoadingText)) ? ViewBag.LoadingText : ""; 
+        if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+        {
+            settings.SettingsLoadingPanel.Text = (!string.IsNullOrEmpty(ViewBag.LoadingText)) ? ViewBag.LoadingText : "Carregando...";
+        }
+        settings.Theme = ViewBag.Tema;
+        settings.ClientSideEvents.BeginCallback = "function(s, e) { LoadingPanel" + UIName + ".Show(); }";
+        settings.ClientSideEvents.EndCallback = "function(s, e) { LoadingPanel" + UIName + ".Hide(); }";
+        settings.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        //settings.ControlStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+        settings.ClientVisible = true;
+        settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        //settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+    }
+).GetHtml()
+
+@Html.DevExpress().LoadingPanel(
+    settings =>
+    {
+        settings.Name = "LoadingPanel" + UIName;
+        settings.Modal = true;
+        settings.Text = "Carregando..."; // (!string.IsNullOrEmpty(ViewBag.LoadingText)) ? ViewBag.LoadingText : "Carregando, por favor, aguarde...";
+        settings.ControlStyle.Border.BorderStyle = System.Web.UI.WebControls.BorderStyle.None;
+        if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request)){
+            //settings.Text = (!string.IsNullOrEmpty(ViewBag.LoadingText)) ? ViewBag.LoadingText : "Carregando...";
+            //settings.VerticalOffset = 20;
+            //settings.HorizontalOffset = 80;
+            //settings.Width = System.Web.UI.WebControls.Unit.Pixel(Request.Browser.ScreenPixelsWidth);
+        }
+        settings.Theme = ViewBag.Tema;
+        //settings.ShowImage = false;
+        settings.ShowImage = true;
+        //settings.Enabled = false;
+        //settings.ContainerElementID = "CallbackPanel" + UIName;
+        settings.ControlStyle.HorizontalAlign = System.Web.UI.WebControls.HorizontalAlign.Center;
+        settings.ControlStyle.VerticalAlign = System.Web.UI.WebControls.VerticalAlign.Middle;
+
+    }
+    ).GetHtml()
+
+<script type="text/javascript">
+    // Este evendo é acionado após o carregamento da página
+    /*LoadingPanel.Show();
+    $(document).ready(function () {
+        LoadingPanel.Hide();
+        //Após a leitura da pagina o evento fadeOut do loader é acionado, esta com delay para ser perceptivo em ambiente fora do servidor.
+        //jQuery("#loader").delay(2000).fadeOut("slow");
+    });*/
+</script>

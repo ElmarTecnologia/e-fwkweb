@@ -1,0 +1,28 @@
+﻿<h2>Gerenciamento de Contextos/Alçadas</h2>
+
+@Html.Action("GridViewPartial", "DevHelper", new
+                            {
+                                dtSource = ViewData["dtSource"],
+                                //sqlCode = ViewData["sqlCode"],
+                                //bdConnection = "ConexaoMySQL",
+                                gridName = "Contextos",
+                                gridKey = "gridKey",
+                                //gridKey = "CodigoUsuario;Contexto",
+                                Tema = ViewBag.Tema,
+                                tamPagina = 30,
+								//Agrupadores = "",
+                                ExportadorPosicao = "Rodape",
+                                //Expanded = false,
+                                DetailAction = "",
+                                //Info = "",
+                                //Totalizadores = "",
+                                ExibeExportador = true,
+								ExibeLinhaFiltro = true,
+								ExibeAgrupador = true,
+                                gridTamPagina = 30,
+                                ColunasOcultas = "gridKey",
+                                CRUDActions = "Usuario|SalvarContexto|SalvarContexto|SalvarContexto|false|CodigoUsuario|Contexto|UsuarioPerfil",
+                                /*ColunasActions = "EDITAR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Create/?isPartial=true&|Gerenciamento|true|IconEdit.png|Email;"+
+                                                 "EXCLUIR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Delete/?isPartial=true&|Gerenciamento|true|IconDelete.png|Email"*/
+                               
+                            })

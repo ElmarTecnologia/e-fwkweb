@@ -1,0 +1,15 @@
+﻿@*{
+    ViewBag.Title = "About";
+}
+<h2>Sobre</h2>
+@ViewContext.Controller.GetType().Assembly.GetName().Version*@
+<br /><br />
+<hgroup class="title">
+    <h1>@ViewBag.Titulo</h1>
+    <h2>@ViewBag.Mensagem</h2>
+</hgroup>
+<p>
+    <strong>Versão da Aplicação @ViewBag.VersaoAPP (E-FWK @ViewBag.VersaoFWK)</strong>
+    <br />
+    <p>Data da última atualização: @ViewBag.lastUpdate</p>    
+</p>

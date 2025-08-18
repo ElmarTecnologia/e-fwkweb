@@ -1,0 +1,34 @@
+﻿@model ELMAR.DevHtmlHelper.Models.UsuarioPerfil
+
+<h2>Cadastro de Perfil</h2>
+
+@if(!string.IsNullOrEmpty(ViewBag.Msg)){
+    @ViewBag.Msg
+    @Html.ValidationSummary(false)    
+}else{    
+    using (Html.BeginForm())
+    {                
+        @*Html.HiddenFor(model => model.Codigo)*@
+        @*Html.Hidden("isPartial", ViewData["isPartial"])*@
+        <!--<input type="hidden" id="CRUDAction" name="CRUDAction" />-->
+        
+        <p>Perfil:</p>            
+        <p>@Html.TextBoxFor(model => model.Titulo, new { id = "inputTitulo" })  <br />@Html.ValidationMessageFor(model => model.Titulo)  </p>
+
+        <p>Redirect:</p>            
+        <p>@Html.TextBoxFor(model => model.RedirectTo, new { id = "inputRedirectTo" })  <br />@Html.ValidationMessageFor(model => model.RedirectTo)  </p>                                          
+
+        <p>Descrição:</p>            
+        <p>@Html.TextBoxFor(model => model.Descricao, new { id = "inputDescricao" })  <br />@Html.ValidationMessageFor(model => model.Descricao)  </p>                                          
+    
+        <p>Ativo:</p>            
+        <p>
+        @Html.RadioButtonFor(model => model.Ativo, true)
+        @Html.Label("rbAutorizarS", "Sim")
+        @Html.RadioButtonFor(model => model.Ativo, false)
+        @Html.Label("rbAutorizarN", "Não")  
+        <br />@Html.ValidationMessageFor(model => model.Ativo)  
+        </p>
+        <!--<input type="submit" value="SALVAR" onclick="$('#CRUDAction').val(this.value)" title="SALVAR" />-->
+    }
+}

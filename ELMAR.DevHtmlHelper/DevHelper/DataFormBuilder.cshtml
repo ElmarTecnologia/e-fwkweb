@@ -1,0 +1,95 @@
+﻿@{
+    System.Text.StringBuilder formCodeSource = new System.Text.StringBuilder();
+    formCodeSource.Append("<form action=\"/Export/Data\" method=\"post\" target=\"_self\">");
+    string ECODE = (string)Model;
+}
+<form action="/Export/Data" method="get" target="_self" onsubmit="this.DXScript.value=''">
+    @{
+        //List<string> Campos = ((List<SelectListItem>)ViewBag.Campos).Select(valor => valor.Value).ToList<string>();
+        string fields = string.Empty;
+        if (ViewBag.Fields != null)
+        {
+            foreach (var item in (string[])ViewBag.Fields)
+            {
+                fields += item + ";";
+            }
+        }
+        formCodeSource.Append("<input type=\"hidden\" name=\"fields\" value=\"" + fields + "\" />");
+        <input type="hidden" name="fields" value="@fields" />
+        string filters = string.Empty;
+        foreach (var item in (string[])ViewBag.Filters)
+        {
+            filters += item + ";";
+        }
+        formCodeSource.Append("<input type=\"hidden\" name=\"filters\" value=\"" + filters + "\" />");
+        <input type="hidden" name="filters" value="@filters" />
+        //Convertendo variáveis de configuração (ViewBag)
+        bool ExibeExportador = (bool)ViewData["ExibeExportador_" + ViewBag.module];
+        bool ExibeLinhaFiltro = (bool)ViewData["ExibeLinhaFiltro_" + ViewBag.module];
+        bool showUrl = (bool)ViewBag.showUrl;
+        bool showAutoForm = (bool)ViewBag.showAutoForm;
+        bool DistinctValues = (bool)ViewBag.DistinctValues;
+    }
+    <!--FILTROS DINÂMICOS-->
+    @foreach (var item in (string[])ViewBag.Filters)
+    {
+        //Não adiciona filtros que sejam parâmetros obrigatórios
+        if (ViewBag.Parametros != null)
+        {
+            if (((string[])ViewBag.Parametros).Contains<string>(item))
+            {
+                continue;
+            }
+        }
+        formCodeSource.Append("<br /><label>" + item + "</label><input type=\"text\" value=\"\" name=\"" + item + "\" />");
+        <br /><label>@item</label><input type="text" value="" name="@item" />
+    }
+    <!--PARAMETRIZAÇÃO OBRIGATÓRIA-->
+    @if (ViewBag.Parametros != null)
+    {
+        foreach (var item in (string[])ViewBag.Parametros)
+        {
+            string name = item.Split('|')[0];
+            string valor = item.Split('|')[1];
+            formCodeSource.Append("<input type=\"hidden\" name=\"" + name + "\" value=\"" + valor + "\"/>");
+            <input type="hidden" name="@name" value="@valor" />
+        }
+    }
+    <!--FILTROS DE PERÍODO PADRÃO-->
+    @{ if (!string.IsNullOrEmpty(ViewBag.cpt)) { formCodeSource.Append("<input type=\"hidden\" name=\"Competência\" value=\"" + ViewBag.cpt + "\" />"); } }
+    <input type="hidden" name="Competência" value="@ViewBag.cpt" />
+    @{if (!string.IsNullOrEmpty(ViewBag.exerc)) { formCodeSource.Append("<input type=\"hidden\" name=\"Exercício\" value=\"" + ViewBag.exerc + "\" />"); } }
+    <input type="hidden" name="Exercício" value="@ViewBag.exerc" />
+    <!--HIDDEN FIELDS-->
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"ecode\" value=\"" + ECODE + "\" />"); }
+    <input type="hidden" name="ecode" value="@ECODE" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"ctx\" value=\"" + (string)Model + "\" />"); }
+    <input type="hidden" name="ctx" value="@Model" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"module\" value=\"" + ViewBag.module + "\" />"); }
+    <input type="hidden" name="module" value="@ViewBag.module" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"returnType\" value=\"" + ViewBag.returnType + "\" />"); }
+    <input type="hidden" name="returnType" value="@ViewBag.returnType" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"Tema\" value=\"" + ViewBag.Tema + "\" />"); }
+    <input type="hidden" name="Tema" value="@ViewBag.Tema" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"ColunasOcultas\" value=\"" + ViewData["ColunasOcultas_" + ViewBag.module] + "\" />"); }
+    <input type="hidden" name="ColunasOcultas" value="@ViewData["ColunasOcultas_" + ViewBag.module]" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"Totalizadores\" value=\"" + ViewData["Totalizadores_" + ViewBag.module] + "\" />"); }
+    <input type="hidden" name="Totalizadores" value="@ViewData["Totalizadores_" + ViewBag.module]" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"Agrupadores\" value=\"" + ViewData["Agrupadores_" + ViewBag.module] + "\" />"); }
+    <input type="hidden" name="Agrupadores" value="@ViewData["Agrupadores_" + ViewBag.module]" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"ExibeExportador\" value=\"" + ViewData["ExibeExportador_" + ViewBag.module] + "\" />"); }
+    <input type="hidden" name="ExibeExportador" value="@ExibeExportador.ToString()" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"ExibeLinhaFiltro\" value=\"" + ViewData["ExibeLinhaFiltro_" + ViewBag.module] + "\" />"); }
+    <input type="hidden" name="ExibeLinhaFiltro" value="@ExibeLinhaFiltro.ToString()" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"showUrl\" value=\"False\" />"); }
+    <input type="hidden" name="showUrl" value="@showUrl.ToString()" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"showAutoForm\" value=\"False\" />"); }
+    <input type="hidden" name="showAutoForm" value="@showAutoForm.ToString()" />
+    @{formCodeSource.Append("<input type=\"hidden\" name=\"DistinctValues\" value=\"" + ViewBag.DistinctValues + "\" />"); }
+    <input type="hidden" name="DistinctValues" value="@DistinctValues.ToString()" />
+    @{formCodeSource.Append("<br /><br /><input type=\"submit\" value=\"FILTRAR DADOS\"/>"); }
+    <br /><br /><input class="btn btn-lg btn-default" type="submit" value="FILTRAR DADOS" />
+</form>
+@{ formCodeSource.Append("</form>"); }
+<br /><br /><span style="font-weight:bold;width:800px;overflow:auto">[CÓDIGO FONTE DO FORMULÁRIO]</span>
+<br />@Html.TextArea("FormCodeSource", @formCodeSource.ToString(), new { style="width:100%"} )

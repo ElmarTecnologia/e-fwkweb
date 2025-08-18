@@ -1,0 +1,28 @@
+﻿<h2>Gerenciamento de Autorizações/Perfil</h2>
+
+@Html.Action("GridViewPartial", "DevHelper", new
+                            {
+                                dtSource = ViewData["dtSource"],
+                                //sqlCode = ViewData["sqlCode"],
+                                //bdConnection = "ConexaoMySQL",
+                                gridName = "PerfilAutorizacoes",
+                                //gridKey = "AutPerfil;AutChamada",
+                                gridKey = "gridKey",
+                                Tema = ViewBag.Tema,
+                                tamPagina = 30,
+								Agrupadores = "Aut Perfil",
+                                ExportadorPosicao = "Rodape",
+                                //Expanded = false,
+                                DetailAction = "",
+                                //Info = "",
+                                //Totalizadores = "",
+                                ExibeExportador = true,
+								ExibeLinhaFiltro = true,
+								ExibeAgrupador = true,
+                                gridTamPagina = 30,
+                                ColunasOcultas = "gridKey",
+                                CRUDActions = "Fwk|SalvarPerfilAutoriza|SalvarPerfilAutoriza|DeletePerfilAutoriza|false|AutPerfil|AutChamada",
+                                /*ColunasActions = "EDITAR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Create/?isPartial=true&|Gerenciamento|true|IconEdit.png|Email;"+
+                                                 "EXCLUIR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Delete/?isPartial=true&|Gerenciamento|true|IconDelete.png|Email"*/
+                               
+                            })

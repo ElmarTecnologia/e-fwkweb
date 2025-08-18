@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Aplicativo para envio de SMS</h2><hr />
+@{
+    //Envia as mensagens
+    int valor = 1000;   
+    int cont = 1;     
+    foreach (var item in (List<Elmar.WebServiceRest.SmsMobile>)Model)
+    {        
+        <script>setTimeout("sendSMS('internal', '@item.Numero', '@item.Conteudo')", @valor);</script>
+        <h3>Mensagem @cont: [@item.Numero - @item.Conteudo]</h3>        
+        valor += 20000;
+        cont += 1;
+    }    
+    if( ((List<Elmar.WebServiceRest.SmsMobile>)Model).Count == 0){
+        <h3>Não há mensagens na fila de envio.</h3><br />        
+    }
+    else{
+        <input type="button" onclick="window.location.href='./Index?debug=@ViewBag.debug'" value="ENVIAR IMEDIATAMENTE" style="width:100%;height:100px"/>
+    }
+}
+
+<script type="text/javascript">
+
+function execTimer(seg) {
+    timer = setTimeout('window.location.href="./Index?debug=@ViewBag.debug"', seg);        
+}
+function stopTest() {
+    clearTimeout(timer);
+}
+//Executa a cada 20 min
+execTimer(600000);
+
+function sendSMS(method, cel, msg) {  
+    var result = true; 
+    if (result) {
+        if (cel != "") {            
+            if (method == "internal"){    
+                //Método para ser executado apenas em aplicativo Android
+                Android.sendSms(cel, msg);                
+            }
+            else{
+                Android.sms(cel, msg);
+            }            
+        }        
+    }
+}
+
+</script>

@@ -1,0 +1,36 @@
+﻿@model ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao
+
+@if (!string.IsNullOrEmpty(ViewBag.Alert))
+{
+    <span style="padding:10px;color:blue"><b>@ViewBag.Alert</b></span>
+    @Html.ValidationSummary(false)
+}
+else
+{
+    <h4>Cadastro de Autorização/Usuário</h4>
+    using (Html.BeginForm("SalvarUsuarioAutoriza", "Fwk"))
+    {
+        @*Html.Hidden("isPartial", ViewData["isPartial"])*@
+        @Html.Hidden("RedirectTo", (string)ViewBag.RedirectTo)
+        <!--<input type="hidden" id="CRUDAction" name="CRUDAction" />-->
+
+        <p>Usuário Cod.:</p>
+        <p>@Html.TextBoxFor(model => model.UsuAutUsuCodigo, new { id = "inputAutUsuCodigo" })  <br />@Html.ValidationMessageFor(model => model.UsuAutUsuCodigo)  </p>
+
+        <p>Chamada:</p>
+        <p>@Html.TextBoxFor(model => model.UsuAutChamada, new { id = "inputAutChamada" })  <br />@Html.ValidationMessageFor(model => model.UsuAutChamada)  </p>
+
+        <p>Parâmetro(s) Fixo(s):</p>
+        <p>@Html.TextBoxFor(model => model.UsuAutParametros, new { id = "inputAutParametros" })  <br />@Html.ValidationMessageFor(model => model.UsuAutParametros)  </p>
+
+        <p>Ativo:</p>
+        <p>
+            @Html.RadioButtonFor(model => model.UsuAutAtivo, true)
+            @Html.Label("rbAutorizarS", "Sim")
+            @Html.RadioButtonFor(model => model.UsuAutAtivo, false)
+            @Html.Label("rbAutorizarN", "Não")
+            <br />@Html.ValidationMessageFor(model => model.UsuAutAtivo)
+        </p>
+        <!--<input type="submit" value="SALVAR" onclick="$('#CRUDAction').val(this.value)" title="SALVAR" />-->
+    }
+}

@@ -1,0 +1,55 @@
+﻿@model ELMAR.DevHtmlHelper.Models.Usuario
+
+<h2>Cadastro de Usuário</h2>
+@if(!string.IsNullOrEmpty(ViewBag.Msg)){
+    @ViewBag.Msg
+    @Html.ValidationSummary(false)    
+}else{
+    using (Html.BeginForm("SalvarUsuario", "Usuario", FormMethod.Post))
+    {                
+        @Html.HiddenFor(model => model.Codigo)
+        @*Html.ValidationMessageFor(model => model.Codigo)*@
+        @*Html.Hidden("isPartial", ViewData["isPartial"])*@
+        @Html.Hidden("RedirectTo",(string)ViewBag.RedirectTo)
+        <!--<input type="hidden" id="CRUDAction" name="CRUDAction" />-->
+        
+        <p>Login:</p>            
+        <p>@Html.TextBoxFor(model => model.Login, new { id = "inputLogin" })  <br />@Html.ValidationMessageFor(model => model.Login)  </p>
+
+        @Html.Action("RevealPass", "Usuario", new { pass = Model.Senha })   
+        <p>Senha:</p>            
+        <p>@Html.PasswordFor(model => model.Senha, new { id = "inputSenha" })  <br />@Html.ValidationMessageFor(model => model.Senha)  </p>                                          
+    
+        <p>Confirmar Senha:</p>            
+        <p>@Html.PasswordFor(model => model.ConfirmSenha, new { id = "inputConfirmSenha" })  <br />@Html.ValidationMessageFor(model => model.ConfirmSenha)  </p>                                          
+    
+        <p>Nome:</p>            
+        <p>@Html.TextBoxFor(model => model.Nome, new { id = "inputNome" })  <br />@Html.ValidationMessageFor(model => model.Nome)  </p>                                          
+    
+        <p>E-mail:</p>            
+        <p>@Html.TextBoxFor(model => model.Email, new { id = "inputEmail" })  <br />@Html.ValidationMessageFor(model => model.Email)  </p>                                          
+    
+        <p>Parâmetro(s) Fixo(s):</p>            
+        <p>@Html.TextBoxFor(model => model.ParametrosFixos, new { id = "inputParametros" })  <br />@Html.ValidationMessageFor(model => model.ParametrosFixos)  </p>                                          
+    
+        <p>Ativo:</p>            
+        <p>
+        @Html.RadioButtonFor(model => model.Ativo, true)
+        @Html.Label("rbAtivoS", "Sim")
+        @Html.RadioButtonFor(model => model.Ativo, false)
+        @Html.Label("rbAtivoN", "Não")  
+        <br />@Html.ValidationMessageFor(model => model.Ativo)  
+        </p>                                          
+    
+        <p>Deve Alterar Senha:</p>            
+        <p>
+        @Html.RadioButtonFor(model => model.DeveAlterarSenha, true)
+        @Html.Label("rbDeveAlterarSenhaS", "Sim")
+        @Html.RadioButtonFor(model => model.DeveAlterarSenha, false)
+        @Html.Label("rbDeveAlterarSenhaN", "Não")  
+        <br />@Html.ValidationMessageFor(model => model.DeveAlterarSenha)  
+        </p>        
+    
+        <!--<input type="submit" value="SALVAR" onclick="$('#CRUDAction').val(this.value)" title="SALVAR" />-->
+    }
+}

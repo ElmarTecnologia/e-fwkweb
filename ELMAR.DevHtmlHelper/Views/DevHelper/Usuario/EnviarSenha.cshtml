@@ -1,0 +1,23 @@
+﻿<style>
+    *{
+        font-family: Arial;
+    }
+</style>
+<h2>@ViewBag.Titulo</h2>
+<h4 style="color:#ff0000">@ViewBag.Msg</h4>
+@using (Html.BeginForm("EnviaSenha"))
+        { 
+
+        @Html.Hidden("Perfil", ViewData["Perfil"]);
+        @Html.Hidden("PreLogin", ViewData["PreLogin"]);
+        @Html.Hidden("RedirectTo", ViewData["RedirectTo"]);
+        @Html.Hidden("Login", ViewData["Login"]);
+        @Html.Hidden("Codigo", ViewData["Codigo"]);
+    
+        Email:<p>@Html.TextBox("Email", ViewData["Email"], new { style="font-weight:bold;font-size:18px" } /*, new { Readonly = true}*/)</p>
+
+        <input type="submit" value="ENVIAR" onclick="return confirmarAcao('')"/>  
+     } 
+<hr />
+Favor conferir se seu e-mail está correto. Caso não esteja favor entrar em contato com o administrador do site através do email @ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("EmailSuporte", Session)
+

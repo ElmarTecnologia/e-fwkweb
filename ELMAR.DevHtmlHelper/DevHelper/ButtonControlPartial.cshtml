@@ -1,0 +1,102 @@
+﻿@Html.DevExpress().Button(
+settings => {
+    settings.Name = ViewBag.Name;
+    settings.Text = ViewBag.Titulo;
+    settings.EnableTheming = true;
+    settings.Theme = ViewBag.Tema;
+    settings.Width = ViewBag.Largura;
+
+    if (ViewBag.VerificaAutorizacao)
+    {
+        ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = null;
+        //ELMAR.DevHtmlHelper.Models.Usuario sessionUser = (ELMAR.DevHtmlHelper.Models.Usuario)Session["USUARIO"];
+        settings.Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, string.Empty);
+        settings.ToolTip = userAut.Info;
+        settings.ClientVisible = settings.Enabled;
+    }
+
+    string redirectLink = string.IsNullOrEmpty(ViewBag.Url) ? /*this.Url.Action(ViewBag.Action, ViewBag.Controller, (RouteValueDictionary)ViewBag.Params)*/ "" : ViewBag.Url;
+
+    //Utiliza os parâmetros chave de um GridViewControl
+    if (!string.IsNullOrEmpty(ViewBag.GridParent))
+    {
+        #region Adicionando os parâmetros 'Params' (RouteValueDictionay)
+        string RouteValueParams = string.Empty;
+        if (ViewBag.Params != null)
+        {
+            string routeValuesLinkJson = ELMAR.DevHtmlHelper.Models.Serializador.SerializarToJson((RouteValueDictionary)ViewBag.Params);
+            RouteValueParams += ", 'routeValuesLink' : '" + routeValuesLinkJson + "'";
+        }
+        #endregion
+        if (((string)ViewBag.Target).Equals("_blank"))
+        {
+            string url = Url.Action((string)ViewBag.Action, (string)ViewBag.Controller, (RouteValueDictionary)ViewBag.Params);
+            if (((bool)ViewData["RequerConfirmacao"]))
+            {
+                settings.ClientSideEvents.Click = "function(s, e){ if (selectedIDs == '') { alert('Nenhum registro selecionado'); e.processOnServer = false; return false; } e.processOnServer = confirm('Confirmar?'); if (e.processOnServer) { window.open('"+ url + "'); } }";
+            }
+            else
+            {
+                settings.ClientSideEvents.Click = "function(s, e){ if(selectedIDs == '') { alert('Nenhum registro selecionado'); e.processOnServer = false; return false; } window.open('" + url + "'); }";
+            }
+        }
+        else //_self
+        {
+            if (((bool)ViewData["RequerConfirmacao"]))
+            {
+                settings.ClientSideEvents.Click = "function(s, e){ if(selectedIDs == ''){ alert('Nenhum registro selecionado'); e.processOnServer = false; return false; } e.processOnServer = confirm('Confirmar?'); if (e.processOnServer){ " + ViewBag.GridParent + ".PerformCallback({'redirectLink' : '" + redirectLink + "', 'actionLink' : '" + ViewBag.Action + "', 'controllerLink' : '" + ViewBag.Controller + "' " + RouteValueParams + ", 'target' : '" + ViewBag.Target + "' }); " + "} }";
+            }
+            else
+            {
+                settings.ClientSideEvents.Click = "function(s, e){ if(selectedIDs == ''){ alert('Nenhum registro selecionado'); e.processOnServer = false; return false; } " + ViewBag.GridParent + ".PerformCallback({'redirectLink' : '" + redirectLink + "', 'actionLink' : '" + ViewBag.Action + "', 'controllerLink' : '" + ViewBag.Controller + "' " + RouteValueParams + ", 'target' : '"+ViewBag.Target+"' }); }";
+            }
+        }
+    }
+    //Redirecionamento direto para Url
+    else if (!string.IsNullOrEmpty(ViewBag.Url))
+    {
+        #region Adiciona os parâmetros na QueryString => 'Params' (RouteValueDictionary)
+        if (ViewBag.Params != null)
+        {
+            foreach (var item in ((RouteValueDictionary)ViewBag.Params))
+            {
+                string separador = ((string)ViewBag.Url).Contains("?") ? "&" : "?";
+                //Adicionando valores à QueryString
+                ViewBag.Url += separador + item.Key + "=" + (item.Value != null ? item.Value : string.Empty);
+            }
+        }
+        #endregion
+        if (((bool)ViewData["RequerConfirmacao"]))
+        {
+            settings.ClientSideEvents.Click = "function(s, e){BeginCallbackAccept(s, e, '" + ViewBag.Url + "', 'parent'); if(e.processOnServer){ CallbackPanel.PerformCallback(); } }";
+        }
+        else
+        {
+            settings.ClientSideEvents.Click = "function(s, e){ parent.location.href = '" + ViewBag.Url + "'; CallbackPanel.PerformCallback(); }";
+        }
+    }
+    else
+    {
+        //TODO: Analisar impacto com transações utilizando o TempData["SelectedID"]
+        //Acesso direto via RouteValues (Controller/Action)
+        if (ViewBag.Params != null)
+        {
+            if (!((RouteValueDictionary)ViewBag.Params).ContainsKey("Controller"))
+            {
+                ((RouteValueDictionary)ViewBag.Params).Add("Controller", ViewBag.Controller);
+                ((RouteValueDictionary)ViewBag.Params).Add("Action", ViewBag.Action);
+            }
+            settings.RouteValues = ViewBag.Params;
+        }
+        else
+        {
+            settings.RouteValues = new { Controller = ViewBag.Controller, Action = ViewBag.Action };
+        }
+
+        if (((bool)ViewData["RequerConfirmacao"]))
+        {
+            settings.ClientSideEvents.Click = "function(s, e){BeginCallbackAccept(s, e, '', ''); if(e.processOnServer){ CallbackPanel.PerformCallback(); } }";
+        }
+
+    }
+}).GetHtml()

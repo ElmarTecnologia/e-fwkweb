@@ -1,0 +1,16 @@
+﻿<h4 style="color:#ff0000">@Model</h4>
+<h2>WS Rest Test</h2>
+<form action="/App/WSRestTest" ID="formWSRest" name="formWSRest" method="POST" target="_blank">
+URL:<br />
+<input type="text" id="url" name="url" value="@ViewBag.Url" size="50"/><br /><br />
+ACTION:<br />
+<select id="action" name="action">
+    <option value="GET">GET</option>
+    <option value="POST">POST</option>
+    <option value="DELETE">DELETE</option>
+</select><br /><br />
+VALUE:<br />
+<textarea id="value" name="value" cols="100" rows="4"></textarea>
+<br /><br />
+<input type="submit" value="EXECUTAR"/>
+</form>

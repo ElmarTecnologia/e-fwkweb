@@ -1,0 +1,35 @@
+﻿@model DevExpress.XtraReports.UI.XtraReport
+@if(((string)ViewBag.ViewControl).Equals("ReportViewer")){
+    if( !((bool)ViewData["isCallback"]) ){
+        @Html.DevExpress().ReportToolbar(settings => {
+            settings.Name = "reportToolbar1";
+            settings.ReportViewerName = "reportViewer1";
+            //settings.Width = System.Web.UI.WebControls.Unit.Pixel(700);
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            settings.ShowDefaultButtons = true;
+            settings.Height = 50;
+            settings.Theme = ViewBag.Tema;
+            settings.EnableTheming = true;
+        }).GetHtml()
+    }
+    @Html.DevExpress().ReportViewer(settings => {
+            settings.Name = "reportViewer1";
+            settings.Report = (DevExpress.XtraReports.UI.XtraReport)Model;
+            settings.CallbackRouteValues = new { Controller = "DevHelper", Action = "ReportControlPartial", sqlCode = ViewData["sqlCode"], isCallback = true, Report = ViewData["Report"], ColunasOcultas = ViewData["ColunasOcultas"], Agrupadores = ViewData["Agrupadores"], Tema = ViewData["Tema"] };
+            settings.ExportRouteValues = new { Controller = "DevHelper", Action = "ReportControlExport", sqlCode = ViewData["sqlCode"], isCallback = true, Report = ViewData["Report"], ColunasOcultas = ViewData["ColunasOcultas"], Agrupadores = ViewData["Agrupadores"], Tema = ViewData["Tema"] };
+            settings.ShouldDisposeReport = false;
+            //settings.Style.Add("overflow", "visible");
+            //settings.Theme = ViewBag.Tema;
+            //settings.EnableTheming = true;
+            //settings.Height = System.Web.UI.WebControls.Unit.Pixel(800);
+    }).GetHtml()
+}
+else
+{
+    @Html.DevExpress().WebDocumentViewer(settings => {
+    settings.Name = "webDocumentViewer1";
+    // Uncomment the following line to enable the mobile mode. 
+    settings.MobileMode = ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request);
+    }).Bind(Model).GetHtml()
+}
+

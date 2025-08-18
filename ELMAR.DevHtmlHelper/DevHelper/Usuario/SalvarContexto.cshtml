@@ -1,0 +1,29 @@
+﻿@model ELMAR.DevHtmlHelper.Models.UsuarioAlcada
+
+<h2>Cadastro de Contexto/Alçada</h2>
+
+@if(!string.IsNullOrEmpty(ViewBag.Msg)){
+    @ViewBag.Msg
+    @Html.ValidationSummary(false)    
+}else{    
+    using (Html.BeginForm("SalvarContexto", "Usuario", FormMethod.Post))
+    {                
+        @*Html.HiddenFor(model => model.Codigo)*@
+        @*Html.Hidden("isPartial", ViewData["isPartial"])*@
+        <!--<input type="hidden" id="CRUDAction" name="CRUDAction" />-->
+        
+        <p>Cod. Usuário:</p>            
+        <p>@Html.TextBoxFor(model => model.CodigoUsuario, new { id = "inputCodUsuario" })  <br />@Html.ValidationMessageFor(model => model.CodigoUsuario)  </p>
+
+        <p>Contexto:</p>            
+        <p>@Html.TextBoxFor(model => model.Contexto, new { id = "inputContexto" })  <br />@Html.ValidationMessageFor(model => model.Contexto)  </p>                                          
+
+        <p>Ctx. Descrição:</p>            
+        <p>@Html.TextBoxFor(model => model.ContextoDescricao, new { id = "inputContextoDescricao" })  <br />@Html.ValidationMessageFor(model => model.ContextoDescricao)  </p>                                          
+    
+        <p>Perfil:</p>            
+        <p>@Html.TextBoxFor(model => model.UsuarioPerfil, new { id = "inputUsuarioPerfil" })  <br />@Html.ValidationMessageFor(model => model.UsuarioPerfil)  </p>                                          
+    
+        <!--<input type="submit" value="SALVAR" onclick="$('#CRUDAction').val(this.value)" title="SALVAR"/>    -->
+    }
+}

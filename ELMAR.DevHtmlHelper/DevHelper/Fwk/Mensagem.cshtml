@@ -1,0 +1,22 @@
+﻿<style>
+    h3 {
+        color: #000;
+    }
+</style>
+@if ((Request["Alert"] != null && !Request["Alert"].Equals(string.Empty))
+        || (ViewBag.Alert != null && !string.IsNullOrEmpty(ViewBag.Alert)))
+    {
+        ViewBag.Alert = string.IsNullOrEmpty(Request["Alert"]) ? ViewBag.Alert : Request["Alert"];
+        @Html.Action("PopupControlPartial", "DevHelper", new
+            {
+                Titulo = "Alerta",
+                Name = "MessageBoxFwk",
+                HtmlContent = ViewBag.Alert,
+                Tema = "Default",
+                Altura = 100,
+                Largura = 350,
+                isMessageBox = true                
+            })
+    }
+<h3>@ViewBag.Msg</h3>
+<h3>@ViewBag.Result</h3>

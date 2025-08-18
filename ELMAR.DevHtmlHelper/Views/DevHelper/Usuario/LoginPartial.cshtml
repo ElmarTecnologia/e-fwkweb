@@ -1,0 +1,81 @@
+﻿@using (Html.BeginForm("DoLogin", "Usuario", FormMethod.Post, new { @class = "customForm", onsubmit = "CallbackPanel.PerformCallback();" }))
+{
+    <h4 style="color:#ff0000">@ViewBag.Msg</h4>
+    @Html.Hidden("Perfil", ViewData["Perfil"]);
+    @Html.Hidden("PreLogin", ViewData["PreLogin"]);
+    @Html.Hidden("RedirectTo", ViewData["RedirectTo"]);
+
+    if ((bool)ViewBag.PreLogin)
+    {
+        @Html.Hidden("Codigo", ViewData["Codigo"]);
+        if (!ViewData["Login"].Equals(ViewData["Email"]))
+        {
+            <label>Usuário:</label>
+            <p>@Html.TextBox("Login", ViewData["Login"], new { id = "inputLogin", Readonly = true, style = "background:#ddd" })</p>
+        }
+        else
+        {
+            @Html.Hidden("Login", ViewData["Login"])
+        }
+        <label>Email:</label>
+        <p>@Html.TextBox("Email", ViewData["Email"], new { id = "inputEmail", Readonly = true, style = "background:#ddd" })</p>
+
+    }
+    else
+    {
+
+        <label>Usuário:</label>
+        <p>@Html.TextBox("Login", ViewData["Login"])</p>
+
+    }
+
+    <label>Senha:</label>
+    <p>@Html.Password("inputSenha")</p>
+
+    if (Session["LoginAttemps"] != null && (int)Session["LoginAttemps"] > 1)
+    {
+        <label>INFORME O RESULTADO DA SOMA:</label>
+        <p>
+            <img alt="Captcha" src="@Url.Action("CaptchaImage", "Fwk")" style="" />
+            <input type="text" name="captcha" id="captcha" value="" class="inputText">
+        </p>
+    }
+
+
+    <input type="submit" value="ACESSAR" />
+    @*Html.ActionLink("Cancelar", "Index", "Participante")*@
+
+    <div style="width:100%;display:table">
+        @if ((bool)ViewBag.ReenviaSenha)
+        {
+            RouteValueDictionary Params1 = new RouteValueDictionary();
+            Params1.Add("Email", ViewData["Email"]);
+            Params1.Add("Perfil", ViewData["Perfil"]);
+            Params1.Add("Login", ViewData["Login"]);
+            Params1.Add("PreLogin", ViewData["PreLogin"]);
+            Params1.Add("RedirectTo", ViewData["RedirectTo"]);
+            Params1.Add("Codigo", ViewData["Codigo"]);
+            @Html.Action("PopupControlPartial", "DevHelper", new
+            {
+                //Url = "/Usuario/Login",
+                Action = "EnviarSenha",
+                Controller = "Usuario",
+                PViewName = "",
+                Params = (RouteValueDictionary)Params1,
+                Titulo = "Envio de Senha",
+                Name = "popupEnviarSenha",
+                Link = "Esqueci minha senha",
+                LinkTip = "Utilize este link caso tenha esquecido ou ainda não tenha senha",
+                Tema = "Default",
+                Altura = 340,
+                Largura = 400
+            })
+            @*Html.ActionLink("Esqueci minha senha | Criar nova senha", "EnviarSenha", new { Email = ViewBag.Email, Perfil = ViewBag.Perfil })*@
+        }
+    </div>
+}
+
+@*if(!string.IsNullOrEmpty(ViewBag.Email) && ViewBag.Perfil == "USER"){
+        @Html.ActionLink("Esqueci minha senha | Criar nova senha", "EnviarSenha", new { Email = ViewBag.Email, Perfil = ViewBag.Perfil })
+    }*@
+

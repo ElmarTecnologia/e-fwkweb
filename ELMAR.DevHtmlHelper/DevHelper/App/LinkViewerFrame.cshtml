@@ -1,0 +1,40 @@
+﻿<!--<iframe id="LinkViewerFrame" src="@ViewBag.Link" frameborder="0" scrolling="no" width="100%" onload="resizingFrame()"></iframe>
+<script language="javascript" type="text/javascript">
+    function resizingFrame() {
+        var height = 0;
+        try {
+            height = $('#LinkViewerFrame').contents().outerHeight();
+        } catch (err) { }
+        if (height == 0) { height = 2800; }
+        $('#LinkViewerFrame').height(height + 50);
+    }
+</script>-->
+@Html.DevExpress().DockPanel(
+settings =>
+{
+    settings.Name = "LinkViewerFrame";
+    settings.OwnerZoneUID = "dockZone_LinkViewerFrame";
+    settings.PopupAnimationType = AnimationType.None;
+    settings.ShowCloseButton = false;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(3200);
+    settings.Theme = ViewBag.Tema;
+    settings.EnableTheming = true;
+    //settings.HeaderText = (string)ViewData["Titulo"];
+    settings.ContentUrl = ViewBag.Link;
+    settings.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+    settings.Style.Add("margin", "0");
+    settings.Style.Add("padding", "0");
+    settings.ShowHeader = false;
+    settings.Styles.Content.Paddings.Padding = 0;
+    settings.Style.Add("border", "none");
+}).GetHtml()
+@Html.DevExpress().DockZone(settings =>
+{
+    settings.Name = "dockZone_LinkViewerFrame";
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.Height = System.Web.UI.WebControls.Unit.Pixel(3200);
+    settings.Theme = ViewBag.Tema;
+    settings.Style.Add("margin", "0");
+    settings.Style.Add("padding", "0");
+}).GetHtml()

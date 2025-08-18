@@ -1,0 +1,48 @@
+﻿@{
+    string imageUrl = ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session) + "/Content/DevHelper/Images/" + "IconLupa.png";
+    <form action="#" class="customForm" id="@("searchMenu" + (string)ViewBag.Name)" method="get" style="border:none;" onsubmit="$('#searchMenu input[name=DXScript]').remove(); CallbackPanel.PerformCallback();">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="text" style="float:left;width:140px;border-radius:3px;" name="searchItem" placeholder="Filtrar Módulo" />
+                <input type="image" style="float:left;width:25px;margin:0px 0px 0px 1px;border:none" title="Filtrar Módulo" src="@imageUrl" alt="Filtrar Módulo" />
+            </div>
+            @if (!ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+            {
+                <div class="col-md-12" style="font-size:11px;margin:-8px 10px 0 10px;padding:10px;">
+                    <i>Para consultar termos mais específicos, deve-se entrar no módulo e utilizar a consulta interna.</i>
+                </div>
+            }
+            <input type="hidden" name="ViewFile" Value="@Request["ViewFile"]" />
+        </div>
+    </form>
+    if (Model is List<ELMAR.DevHtmlHelper.Models.Fwk_MenuItem>)
+    {
+        List<ELMAR.DevHtmlHelper.Models.Fwk_MenuItem> Menus = (List<ELMAR.DevHtmlHelper.Models.Fwk_MenuItem>)Model;
+        string search = !string.IsNullOrEmpty(Request["searchItem"]) ? Request["searchItem"] : string.Empty;
+        if (!string.IsNullOrEmpty(search) /*&& !((string)ViewBag.Name).ToLower().Contains("super")*/)
+        { //Não busca nos menus do E-Fwk
+            List<ELMAR.DevHtmlHelper.Models.Fwk_MenuItem> FilteredMenus =
+                Menus.FindAll(x => (x.Titulo.ToLower().Contains(search.ToLower()) || (x.Pai != null && x.Pai.Titulo.ToLower().Contains(search.ToLower()))) && !x.Action.Equals(string.Empty));
+            string htmlResult = string.Empty;
+            foreach (var item in FilteredMenus)
+            {
+                //Exibe o Popup Resultado da busca, modo 'Alert'
+                htmlResult += "<p><a style=\"text-decoration:none;font-size:16px;font-weight:bold;\" href=\"" + item.NavUrl + "\" title=\"" + item.ToolTip + "\">" + item.Titulo + "</a></p><hr />";
+            }
+            htmlResult = string.IsNullOrEmpty(htmlResult) ? "Nenhum resultado encontrado!" : htmlResult;
+            if (!string.IsNullOrEmpty(htmlResult))
+            {
+                @Html.Action("PopupControlPartial", "DevHelper", new
+                {
+                    Titulo = "Resultado da Busca",
+                    Name = "MessageBox_" + (string)ViewBag.Name,
+                    HtmlContent = htmlResult,
+                    Tema = (string)ViewBag.Tema,
+                    Altura = 480,
+                    Largura = 480,
+                    isMessageBox = true
+                })
+            }
+        }
+    }
+}

@@ -1,0 +1,45 @@
+﻿@model ELMAR.DevHtmlHelper.Models.Chamada
+
+@if (!string.IsNullOrEmpty(ViewBag.Alert))
+{
+    <span style="padding:10px;color:blue"><b>@ViewBag.Alert</b></span>    
+    @Html.ValidationSummary(false)
+}
+else
+{
+    <h4>Cadastro de Chamada</h4>
+    using (Html.BeginForm("SalvarChamada", "Fwk", FormMethod.Post))
+    {
+        @Html.Hidden("RedirectTo", (string)ViewBag.RedirectTo)
+
+        <p>Action:</p>
+        <p>
+            @Html.DevExpress().TextBoxFor(model => model.Action,
+                    settings =>
+                         {
+                        //settings.Properties.MaskSettings.Mask = "000'.'000'.'000-00";
+                        //settings.Properties.MaskSettings.IncludeLiterals = MaskIncludeLiteralsMode.None;
+                    }).GetHtml()
+            <br />@Html.ValidationMessageFor(model => model.Action)
+        </p>
+
+        <p>Controller:</p>
+        <p>@Html.TextBoxFor(model => model.Controller, new { id = "inputController" })  <br />@Html.ValidationMessageFor(model => model.Controller)  </p>
+
+        <p>Título:</p>
+        <p>@Html.TextBoxFor(model => model.Titulo, new { id = "inputTitulo" })  <br />@Html.ValidationMessageFor(model => model.Titulo)  </p>
+
+        <p>Descrição:</p>
+        <p>@Html.TextBoxFor(model => model.Descricao, new { id = "inputDescricao" })  <br />@Html.ValidationMessageFor(model => model.Descricao)  </p>
+
+        <p>Requer Autorização:</p>
+        <p>
+            @Html.RadioButtonFor(model => model.RequerAutorizacao, true)
+            @Html.Label("rbAutorizarS", "Sim")
+            @Html.RadioButtonFor(model => model.RequerAutorizacao, false)
+            @Html.Label("rbAutorizarN", "Não")
+            <br />@Html.ValidationMessageFor(model => model.RequerAutorizacao)
+        </p>
+        <!--<input type="submit" value="SALVAR" onclick="$('#CRUDAction').val(this.value)" title="SALVAR" />-->
+    }
+}

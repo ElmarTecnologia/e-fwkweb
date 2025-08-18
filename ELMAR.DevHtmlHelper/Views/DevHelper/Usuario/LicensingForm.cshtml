@@ -1,0 +1,25 @@
+﻿@{
+    ViewBag.Title = "LicensingForm";
+}
+
+<h2>Liberador</h2>
+
+@using (Html.BeginForm("Login", "App", new { ViewFile = "LicensingForm" }))
+{
+    <p>ClientID:</p>               
+    <p>@Html.TextBox("ClientID")</p>  
+    <input type="submit" value="Carregar Parâmetros"/>                 
+}
+
+@using (Html.BeginForm("Encrypto", "Usuario", FormMethod.Post, new { onsubmit = "return confirm('Confirmar?')", target="_blank" }))
+{
+    <p>App:</p>               
+    <p>@Html.TextBox("App", (string)ViewBag.App)</p>  
+    <p>Data de Expiração (Deixar em branco para licença permanente):</p>                  
+    <p>@Html.TextBox("Data")</p>    
+    <p>ID Físico:</p>           
+    <p>@Html.TextBox("Mac", (string)ViewBag.Mac)</p>        
+    <!--<p>Licensing ID:</p>               
+    <p>@Html.TextBox("key")</p>-->
+    <input type="submit" value="Gerar Licença"/>                 
+}

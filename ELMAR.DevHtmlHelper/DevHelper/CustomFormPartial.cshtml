@@ -1,0 +1,100 @@
+﻿@{
+    string[] formFields = ViewData["Campos"].ToString().Split(';');
+    string onSubmit = ViewBag.OnSubmit;
+    if ((bool)ViewBag.PerformCallback)
+    {
+        onSubmit = "this.DXScript.value=''; this.DXCss.value=''; CallbackPanel.PerformCallback(); " + onSubmit;
+    }
+}
+<form class="customForm" action="@ViewBag.Action" name="@ViewBag.Name" id="@ViewBag.Name" onsubmit="@onSubmit" method="@ViewBag.Method" target="@ViewBag.Target" enctype="multipart/form-data">
+    <input type="hidden" id="formName" name="formName" value="@ViewBag.Name">
+    @foreach (string name in formFields)
+    {
+        string[] param = name.Split('|');
+        string type = "text";
+        string value = string.Empty;
+        string inputID = string.Empty;
+        string mask = string.Empty;
+        if (param.Length > 2)
+        {
+            value = param[2];
+        }
+        if (param.Length > 3)
+        {
+            type = param[3];
+            if (type.Equals("hidden"))
+            {
+                //Não exibe o label para campos do tipo hidden
+                param[0] = string.Empty;
+            }
+            if (param.Length > 4)
+            {
+                mask = param[4];
+            }
+        }
+        if (param[0] != string.Empty)
+        {
+            <!--<label>@param[0]</label>-->
+            @*Html.DevExpress().Label(settings => {
+                settings.Text = param[0];
+                settings.Theme = ViewBag.Tema;
+                }).GetHtml()*@
+        }
+        //Recebe o valor Request (GET/POST) para pre-preenchimento dos campos do form
+        if (ViewBag.Name.Equals(Request["formName"]) || ViewBag.Name.Equals(Request.Form["form"]))
+        {
+            value = !string.IsNullOrEmpty(Request[param[1]]) ? Request[param[1]] : value;
+            //Prioriza as variáveis do tipo POST
+            if (Request.Form[param[1]] != null)
+            {
+                value = !string.IsNullOrEmpty(Request.Form[param[1]]) ? Request.Form[param[1]] : value;
+            }
+        }
+        inputID = ViewBag.Name + "_" + param[1];
+        if (type.Equals("hidden"))
+        {
+            <input type="@type" id="@inputID" name="@param[1]" value="@value">
+        }
+        else
+        {
+            @Html.DevExpress().TextBox(
+                settings =>
+                {
+                    settings.Name = inputID;
+                    settings.Properties.ClientInstanceName = param[1];
+                    settings.Text = value;
+                    settings.Properties.MaskSettings.Mask = mask;
+                    settings.Width = System.Web.UI.WebControls.Unit.Pixel(150);
+                    if (!string.IsNullOrEmpty(mask))
+                        settings.Width = System.Web.UI.WebControls.Unit.Pixel(mask.Length * 10);
+                    if(mask.Length <= 10)
+                        settings.ControlStyle.CssClass = "inputSmall";
+                    settings.ClientVisible = !type.Equals("hidden");
+                    settings.Style.Add("float", "left");
+                    settings.Style.Add("margin", "10px 0 0 0");
+                    settings.Theme = ViewBag.Tema;
+                    settings.Properties.NullText = param[0];
+                    //settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
+                }
+            ).GetHtml()
+        }
+    } <!--End foreach formFields-->
+    @Html.DevExpress().Button(
+            settings => {
+                settings.Name = "btnSubmit"+ViewBag.Name;
+                settings.Text = ViewBag.SubmitText;
+                settings.UseSubmitBehavior = true;
+                settings.Theme = ViewBag.Tema;
+                settings.Style.Add("float", "left");
+                settings.Style.Add("margin", "10px 0 0 0");
+                 if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+                {
+                    settings.Style.Add("width", "140px");
+                }
+                if ((bool)ViewBag.PerformCallback)
+                {
+                    //settings.ClientSideEvents.Click = "function(s, e) { CallbackPanel.PerformCallback(); }";
+                }
+            }
+        ).GetHtml()
+</form>

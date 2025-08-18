@@ -1,0 +1,135 @@
+﻿@{
+    string[] hideTabs = Request["hTab"] != null ? Request["hTab"].Split(',') : null;
+    hideTabs = Request["hTabs"] != null ? Request["hTabs"].Split(',') : hideTabs;
+    if (Request.Form["hTab"] != null)
+    {
+        hideTabs = Request.Form["hTab"] != null ? Request.Form["hTab"].Split(',') : null;
+    }
+
+    //Monta script para ocultar de abas
+    string hideTabScript = string.Empty;
+    if (hideTabs != null)
+    {
+        foreach (var item in hideTabs)
+        {
+            if (string.IsNullOrEmpty(item)) { continue; }
+            int idxTab = int.Parse(item) - 1; //Possibilita a indexação a partir do valor 1
+            hideTabScript += "var tab" + idxTab.ToString() + " = s.GetTab(" + idxTab.ToString() + "); tab" + idxTab.ToString() + ".SetVisible(false);";
+        }
+    }
+
+    string Tab = Request["tab"];
+    if (Request.Form["Tab"] != null)
+    {
+        Tab = Request.Form["Tab"];
+    }
+
+    string Tabs = Request["tabs"];
+    if (Request.Form["tabs"] != null)
+    {
+        Tabs = Request.Form["tabs"];
+    }
+
+    //Ativa a Rolagem Automática
+    int activeRoll = (ViewBag.Qtde != null && ViewBag.Qtde >= 6) ? 1 : 0;
+
+    RouteValueDictionary tabParams = new RouteValueDictionary();
+    if (ViewData["ActionTabsParams"] is RouteValueDictionary)
+    {
+        tabParams = (RouteValueDictionary)ViewData["ActionTabsParams"];
+    }
+}
+
+@Html.DevExpress().PageControl(
+settings =>
+{
+    settings.Name = (string)ViewData["Name"];
+    settings.ShowTabs = !((!string.IsNullOrEmpty(Tab) && Tab.Contains("*")) || (!string.IsNullOrEmpty(Tabs) && Tabs == "off"));
+    settings.ActivateTabPageAction = ActivateTabPageAction.Click;
+    //settings.EnableHotTrack = true;
+    //settings.SaveStateToCookies = true;
+    settings.TabAlign = TabAlign.Left;
+    settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+    settings.EnableTabScrolling = true;
+    //settings.ClientSideEvents.TabClick = "";
+    if (!string.IsNullOrEmpty(ViewBag.CallbackController) && !string.IsNullOrEmpty(ViewBag.CallbackAction))
+    {
+        //settings.CallbackRouteValues = new { Controller = ViewBag.CallbackController, Action = ViewBag.CallbackAction, Tema = ViewData["Tema"].ToString(), isPartial = true, ctx = Model != null ? (string)Model : null };
+        tabParams.Add("Controller", ViewBag.CallbackController);
+        tabParams.Add("Action", ViewBag.CallbackAction);
+        tabParams.Add("Tema", ViewData["Tema"].ToString());
+        tabParams.Add("isPartial", true);
+        tabParams.Add("ctx", (Model != null ? (string)Model : null));
+        settings.CallbackRouteValues = tabParams;
+        settings.ClientSideEvents.BeginCallback = "function(s,e){ e.customArgs['Tab'] = s.GetActiveTabIndex(); e.customArgs['sTab'] = s.GetActiveTabIndex(); e.isPartial = true; }";
+    }
+
+    if (hideTabs != null)
+        settings.ClientSideEvents.Init = "function(s, e){" + hideTabScript + "}";
+
+    if (ViewData["Tabs"] != null && !string.IsNullOrEmpty(ViewData["Tabs"].ToString()))
+    {
+        string[] TabsViews = ViewData["Tabs"].ToString().Split(';');
+        Dictionary<string, RouteValueDictionary> parametros = new Dictionary<string, RouteValueDictionary>();
+        if (ViewData["ActionTabsParams"] is Dictionary<string, RouteValueDictionary>)
+            parametros = (Dictionary<string, RouteValueDictionary>)ViewData["ActionTabsParams"];
+        bool isActionTab = false;
+        foreach (string name in TabsViews)
+        {
+            string titulo = "", partialview = "", action = "", controller = "";
+            string[] TabContent = name.Split('|');
+            isActionTab = false;
+
+            if (TabContent.Length == 1)
+            {
+                titulo = partialview = name;
+            }
+            else if (TabContent.Length == 2)
+            {
+                titulo = TabContent[0];
+                partialview = TabContent[1];
+            }
+            else if (TabContent.Length > 2)
+            {
+                titulo = TabContent[0];
+                action = TabContent[1];
+                controller = TabContent[2];
+                isActionTab = true;
+            }
+            if (isActionTab)
+            {
+                settings.TabPages.Add(titulo).SetContent(() =>
+                {
+                    Html.RenderAction(action, controller, parametros[action]);
+                });
+            }
+            else
+            {
+                settings.TabPages.Add(titulo).SetContent(() =>
+                {
+                    Html.RenderPartial(partialview, tabParams);
+                });
+            }
+        }
+    }
+
+    int activeTabIndex = 0;
+    if (!string.IsNullOrEmpty(Tab))
+    {
+        int.TryParse(Tab.Replace("*", ""), out activeTabIndex);
+        if (activeTabIndex != 0)
+        {
+            activeTabIndex = activeTabIndex - 1;
+        }
+        else
+        {
+            TabPage tPage = settings.TabPages.FindByText(Tab);
+            activeTabIndex = tPage.Index;
+        }
+    }
+
+    settings.ActiveTabIndex = activeTabIndex; //!string.IsNullOrEmpty(Tab) ? int.Parse(Tab.Replace("*", "")) - 1 : 0;
+    settings.Theme = (string)ViewData["Tema"];
+    settings.EnableTheming = true;
+
+}).GetHtml()

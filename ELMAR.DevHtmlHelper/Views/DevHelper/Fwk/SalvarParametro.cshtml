@@ -1,0 +1,29 @@
+﻿@model ELMAR.DevHtmlHelper.Models.FwkConfig
+
+@if (!string.IsNullOrEmpty(ViewBag.Alert))
+{
+    <span style="padding:10px;color:blue"><b>@ViewBag.Alert</b></span>
+    @Html.ValidationSummary(false)
+}
+else
+{
+    <h4>Cadastro de Parâmetros</h4>
+    using (Html.BeginForm("SalvarParametro", "Fwk"))
+    {
+        @Html.HiddenFor(model => model.Codigo)
+        @Html.ValidationMessageFor(model => model.Codigo)
+        @*Html.Hidden("isPartial", ViewData["isPartial"])*@
+        @Html.Hidden("RedirectTo", (string)ViewBag.RedirectTo)
+
+        <p>Chave:</p>
+        <p>@Html.TextBoxFor(model => model.Chave, new { id = "inputChave" })  <br />@Html.ValidationMessageFor(model => model.Chave)  </p>
+
+        <p>Valor:</p>
+        <p>@Html.TextBoxFor(model => model.Valor, new { id = "inputValor" })  <br />@Html.ValidationMessageFor(model => model.Valor)  </p>
+
+        <p>CTX:</p>
+        <p>@Html.TextBoxFor(model => model.Contexto, new { id = "inputCTX" })  <br />@Html.ValidationMessageFor(model => model.Contexto)  </p>
+
+        <!--<input type="submit" value="SALVAR" onclick="$('#CRUDAction').val(this.value)" title="SALVAR" />-->
+    }
+}

@@ -1,0 +1,30 @@
+﻿<h2>Gerenciamento de Usuários</h2>
+
+@Html.Action("GridViewPartial", "DevHelper", new
+                            {
+                                dtSource = ViewData["dtSource"],
+                                //sqlCode = ViewData["sqlCode"],
+                                //bdConnection = "ConexaoMySQL",
+                                gridName = "Usuarios",
+                                //gridKey = "Codigo",
+                                gridKey = "gridKey",
+                                Tema = ViewBag.Tema,
+                                tamPagina = 30,
+								Agrupadores = "Usuario Perfil",
+                                Expanded = true,
+                                DetailAction = "",
+                                Largura = "100%",
+                                ExportadorPosicao = "Rodape",
+                                //Info = "",
+                                //Totalizadores = "",
+                                ExibeExportador = true,
+								ExibeLinhaFiltro = true,
+								ExibeAgrupador = true,
+                                ColunasOcultas = "Perfil;Senha;Contextos;Confirm Senha;gridKey;Confirm Email",
+                                ColunasDateTime = "DtUltAtualizacao",
+                                gridTamPagina = 30,
+                                CRUDActions = "Usuario|SalvarUsuario|SalvarUsuario|SalvarUsuario|false|Codigo"
+                                /*ColunasActions = "EDITAR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Create/?isPartial=true&|Gerenciamento|true|IconEdit.png|Email;"+
+                                                 "EXCLUIR|"+@ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+"/Encontreiro/Delete/?isPartial=true&|Gerenciamento|true|IconDelete.png|Email"*/
+                               
+                            })
