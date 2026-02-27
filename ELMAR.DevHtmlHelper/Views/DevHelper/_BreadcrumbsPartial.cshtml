@@ -2,16 +2,16 @@
 {
 	<div class="w-100" style="float:left;display:flex;font-size:16px;margin-bottom:20px;padding:4px;background:#f5f5f5;">
 		@Html.ActionLink("Home", "Index", "Home", new { ctx = (string)Model }, new { style = "float:left; font-size:15px;" }) 
-		@Html.Label(" > ", " > ", new { style = "float:left; font-size:15px;" })
+		@Html.Label(" > ", " > ", new { style = "float:left; font-size:15px;", id="lbArrow1" })
 		@if (ViewContext.RouteData.Values["action"].ToString() != "Index")
 		{
 			@Html.ActionLink(ViewContext.RouteData.Values["controller"].ToString(), "Index", ViewContext.RouteData.Values["controller"].ToString(), new { ctx = (string)Model }, new { style = "float:left; font-size:15px;" })
-			@Html.Label(" > ", " > ", new { style = "float:left; font-size:15px;" })
+			@Html.Label(" > ", " > ", new { style = "float:left; font-size:15px;", id= "lbArrow2" })
 			@Html.Label(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["action"].ToString(), new { style = "float:left; font-size:15px;" })
 		}
 		else
 		{
-			@Html.Label(ViewContext.RouteData.Values["controller"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { style = "float:left; font-size:15px;" })
+			@Html.Label(ViewContext.RouteData.Values["controller"].ToString(), ViewContext.RouteData.Values["controller"].ToString(), new { style = "float:left; font-size:15px;", id="lbInfoPath" })
 		}
 	</div>
 }

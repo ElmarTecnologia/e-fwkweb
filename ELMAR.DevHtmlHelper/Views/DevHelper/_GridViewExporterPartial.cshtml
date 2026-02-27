@@ -1,17 +1,11 @@
 ﻿@{ 
-	var jsScriptPDF = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'PDF' });";
-    var jsScriptRTF = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'RTF' });";
-    var jsScriptXLS = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'XLS' });";
-    var jsScriptCSV = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'CSV' });";
-    var jsScriptTXT = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'TXT' });";
+	var jsScriptPDF = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'PDF', 'isCallBack': true });";
+    var jsScriptRTF = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'RTF', 'isCallBack': true });";
+    var jsScriptXLS = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'XLS', 'isCallBack': true });";
+    var jsScriptCSV = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'CSV', 'isCallBack': true });";
+    var jsScriptTXT = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'TXT', 'isCallBack': true });";
 }
 <div class="ExportBox" style="float:right;font-size:12px;">
-    <!--<label>Salvar como...</label><br /><br />-->
-    <!--<input type="image" src="~/Content/DevHelper/Images/pdf.png" name="OutputFormat1" value="PDF" onclick="javascript:@jsScriptPDF" title="Exportar PDF" />
-    <input type="image" src="~/Content/DevHelper/Images/rtf.png" name="OutputFormat2" value="RTF" onclick="javascript:@jsScriptRTF" title="Exportar RTF" />
-    <input type="image" src="~/Content/DevHelper/Images/xls.png" name="OutputFormat3" value="XLS" onclick="javascript:@jsScriptXLS" title="Exportar XLS" />
-    <input type="image" src="~/Content/DevHelper/Images/csv.png" name="OutputFormat4" value="CSV" onclick="javascript:@jsScriptCSV" title="Exportar CSV" />
-    <input type="image" src="~/Content/DevHelper/Images/txt.png" name="OutputFormat5" value="TXT" onclick="javascript:@jsScriptTXT" title="Exportar TXT" />-->
     <input type="button" name="OutputFormat1" value="PDF" onclick="javascript:@jsScriptPDF" title="Exportar PDF" />
     <input type="button" name="OutputFormat2" value="RTF" onclick="javascript:@jsScriptRTF" title="Exportar RTF" />
     <input type="button" name="OutputFormat3" value="XLS" onclick="javascript:@jsScriptXLS" title="Exportar XLS" />

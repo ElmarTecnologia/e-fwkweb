@@ -1,4 +1,4 @@
-﻿@if (!ViewBag.IsInternal)
+﻿@if (!ViewBag.IsInternal || true)
 {
     @Scripts.Render("~/Content/DevHelper/js")
     @Scripts.Render("~/bundles/jquery")
@@ -6,6 +6,7 @@
     @Styles.Render("~/Content/themes/base/css")
     @Html.Partial("_ScriptsControlDevEx")
 }
+	
 <script type="text/javascript">
     try {
         parent.LoadingPanel.Hide();

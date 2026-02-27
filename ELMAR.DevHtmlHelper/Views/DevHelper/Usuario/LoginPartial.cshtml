@@ -1,5 +1,8 @@
-﻿@using (Html.BeginForm("DoLogin", "Usuario", FormMethod.Post, new { @class = "customForm", onsubmit = "CallbackPanel.PerformCallback();" }))
+﻿@using (Html.BeginForm("DoLogin", "Usuario", FormMethod.Post, 
+new { @class = "customForm", onsubmit = "CallbackPanel.PerformCallback();", style="text-align:center;align:center;" }))
 {
+	<h6>Autenticação</h6>
+
     <h4 style="color:#ff0000">@ViewBag.Msg</h4>
     @Html.Hidden("Perfil", ViewData["Perfil"]);
     @Html.Hidden("PreLogin", ViewData["PreLogin"]);
@@ -10,42 +13,37 @@
         @Html.Hidden("Codigo", ViewData["Codigo"]);
         if (!ViewData["Login"].Equals(ViewData["Email"]))
         {
-            <label>Usuário:</label>
-            <p>@Html.TextBox("Login", ViewData["Login"], new { id = "inputLogin", Readonly = true, style = "background:#ddd" })</p>
+            @Html.TextBox("Login", ViewData["Login"], new { id = "inputLogin", Readonly = true, @class = "input-medium", placeholder="Usuário" })
         }
         else
         {
             @Html.Hidden("Login", ViewData["Login"])
         }
-        <label>Email:</label>
-        <p>@Html.TextBox("Email", ViewData["Email"], new { id = "inputEmail", Readonly = true, style = "background:#ddd" })</p>
+        @Html.TextBox("Email", ViewData["Email"], new { id = "inputEmail", Readonly = true, @class = "input-medium", placeholder="E-mail" })
 
     }
     else
     {
 
-        <label>Usuário:</label>
-        <p>@Html.TextBox("Login", ViewData["Login"])</p>
+        @Html.TextBox("Login", ViewData["Login"], new { @class = "input-medium", placeholder="Usuário" })
 
     }
 
-    <label>Senha:</label>
-    <p>@Html.Password("inputSenha")</p>
+    @Html.Password("inputSenha", "", new { @class = "input-medium", placeholder="Senha" })
 
     if (Session["LoginAttemps"] != null && (int)Session["LoginAttemps"] > 1)
     {
-        <label>INFORME O RESULTADO DA SOMA:</label>
+        <span>INFORME O RESULTADO DA SOMA:</span>
         <p>
             <img alt="Captcha" src="@Url.Action("CaptchaImage", "Fwk")" style="" />
             <input type="text" name="captcha" id="captcha" value="" class="inputText">
         </p>
     }
-
-
-    <input type="submit" value="ACESSAR" />
+	
+    <input type="submit" value="ACESSAR" style="width:100%;"/>
     @*Html.ActionLink("Cancelar", "Index", "Participante")*@
 
-    <div style="width:100%;display:table">
+    <div style="width:100%;display:table;padding-top:10px;">
         @if ((bool)ViewBag.ReenviaSenha)
         {
             RouteValueDictionary Params1 = new RouteValueDictionary();
@@ -78,4 +76,3 @@
 @*if(!string.IsNullOrEmpty(ViewBag.Email) && ViewBag.Perfil == "USER"){
         @Html.ActionLink("Esqueci minha senha | Criar nova senha", "EnviarSenha", new { Email = ViewBag.Email, Perfil = ViewBag.Perfil })
     }*@
-

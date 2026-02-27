@@ -1,0 +1,289 @@
+﻿::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+.ExportBox
+{
+	border: 1px inset #bbb;
+	float:left;
+    position:relative;
+	padding:5px;
+	background:#fff;
+	margin:10px;
+    color:#777;
+}
+    .ExportBox label {
+        font-family:Verdana;
+        font-size:12px;
+    }
+.ExportBox input, .ExportBox button
+{
+    background:none;
+    width:40px;
+}
+
+.lbGroupBy {
+    float: left;
+    font-size: 12px;
+    width:98%;
+    display:table;
+}
+
+.popupLink{height:21px;position:relative;float:left;text-align:center;font-weight:bold}
+.popupLink2{width:400px;height:30px;position:relative;left:50%;margin:0 0 10px -200px;text-align:center}
+.popupLink a, .popupLink2 a
+{
+    float: left;
+    margin-right: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    color:#ccc;
+    text-decoration:none;
+}
+
+.customForm{width:98%;display:table;font-size:12px;padding:5px;background:none;}
+
+.customForm label {
+	padding: 3px 10px;
+    margin-right: 10px;
+    display: inline-block;
+    border-bottom: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+	font-weight:bold;
+    min-width: 120px;
+	float:left;
+}
+.customForm span{float:left;}
+
+.customForm input[type=text], .customForm input[type=password], .customForm select, 
+.customForm input[type=radio], .customForm textarea{
+    padding: 3px 10px;
+    margin: 2px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+	min-width:80px;	
+	float:left;
+}
+.customForm select{
+	min-width:270px;	
+	max-width:270px;
+}
+
+.customForm input[type=submit],
+.customForm input[type=button],
+.customForm submit {
+    width: 270px;
+    background-color: #888;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin:20px 0 0 5px;
+	display:block;
+	float:left;
+}
+
+.customForm input[type=submit]:hover {
+    background-color: #bbb;
+	color:#000;	
+}
+
+fieldset {
+    font-family: sans-serif;
+    border:none;
+    border-top: 2px solid #555;
+    background: none;
+    padding: 5px;
+    float:left;
+    width:97%; 
+}
+
+fieldset legend {
+    margin-left:10px;
+    background-color:#555; 
+    padding-left:10px;
+    padding-top:5px; 
+    padding-right:120px; 
+    padding-bottom:5px;
+    color:white; 
+    border-radius:15px; 
+    border:2px none #eeece1; 
+    font-size:16px;
+}
+
+fieldset ol {
+    padding: 0;
+    list-style: none;
+}
+
+fieldset ol li {
+    padding-bottom: 5px;
+}
+
+.gridViewGroupBy { height:25px; }
+
+.popupLinkDiv{height:21px;position:relative;text-align:center;font-weight:bold;float:left;}
+    .popupLinkDiv img {
+        height:21px;        
+    }
+.popupLinkDiv a, .popupLink a, .popupLink
+{
+    font-size: 14px;
+    font-weight: bold;    
+    border:1px outset #ccc;
+    border:none;
+    border-radius:4px;
+    height:21px;    
+    margin-left:-5px;
+    text-decoration:none;
+}
+    .popupLink {
+        font-size:14px;
+    }
+
+/*li .dxtc-spacer, ul .dxtc-strip {
+    margin:0;
+    padding:0;   
+}*/
+li .dxtc-spacer{height:0px; width:0px; margin:auto; position:absolute}
+a.dxtc-link {z-index:400;position:relative;float:left;}
+.dxpc-headerContent{z-index:9999}
+
+/*Layout Padrão*/
+.divOperations {    
+    padding: 5px;
+    min-width:100%;
+}
+.divOperationsPanel{
+ width:100%;
+}
+.divMenu {
+    float: left;
+    width: 16%;
+    height: auto;     
+	color:#000;
+    overflow:auto;
+}
+    .divMenu.full {        
+        width: 99%;
+        margin-left:5px; 
+		overflow:hidden;
+    }
+.divCenter {
+    float: left;
+    width: 72%;	
+    padding:5px;
+    min-height: 400px;
+    background:none;
+    border:none;
+    margin-bottom:40px;
+    background:#fff;
+	overflow:auto;
+}
+    .divCenter.full {
+        width: 100%;
+		margin-top:20px;
+		margin-left:10px;        
+    }
+.divCenter2 {
+    float: left;
+    width: 82%;
+    margin: 0px 0px 10px 10px; 
+	min-height: 400px;
+    background:none;
+    border:none;
+    background:#fff;
+	overflow:auto;
+    padding-bottom:30px;
+	margin-left:10px;        
+}
+    .divCenter2.full {
+        width: 100%; 
+        overflow:hidden;
+        margin-top:40px;
+    }
+.divRight, .divLeft {
+    float: left;
+    width: 8%;
+	margin: 10px 0px 10px 0px;
+    padding:15px 10px 0 10px;
+    padding-bottom: 20px;    
+}
+
+    .divRight.full, .divLeft.full {
+        width: 97%;
+    }
+
+.contentPanelFwkLogin {
+    width:320px;left:50%;position:relative;margin-left:-160px;float:left;
+}
+
+@media print {
+    /* Hide everything in the body when printing... */
+    body.printing * { display: none; }
+    /* ...except our special div. */
+    body.printing #print-me { display: block; }
+}
+@media screen {
+    /* Hide the special layer from the screen. */
+    #print-me { display: none; }
+}
+	
+@media only screen and (max-width: 720px) {
+  .divMenu, .divCenter, .divCenter2, .divLeft, .divRight, .divCenter2.full, .divCenter.full
+    {
+        width:98%;
+        height:auto;
+        margin-left:10px;
+		padding:0;        
+        overflow:auto;
+	}
+	.divMenu.full{width:97%;margin-left:9px;overflow:hidden;}
+    .divCenter, .divCenter2 {
+        background:#fff; padding:5px;
+    }
+	.divOperationsPanel{
+		width:220px; float:left; position:relative; left:50%; margin-left:-100px;
+	}	
+	.customForm, 
+	.divOperations	
+	{ 
+        float:left; width:98%; height:auto; margin:0; padding:0; font-size:18px; display:block; overflow:hidden;
+	}
+		.customForm input[type=text], 
+		.customForm input[type=password], 
+		.customForm select, .customForm.selectControl,
+	    .customForm input[type=submit],
+        .customForm input[type=button],
+        .selectControl, .customForm textarea, .customForm label, fieldset {
+            width:100%; display:block; overflow:hidden; margin:0; padding:0; font-size:18px;
+        }
+		.customForm input[type=submit],
+        .customForm input[type=button]{
+			height:30px;margin-bottom:10px;
+        }
+		.customForm span{
+			float:left;
+		}
+    .subTitulo {
+        width:60%;
+    }	
+    .gridViewGroupBy, .gridViewGroupBy select  {
+        min-width:80%;
+		display:table;
+    }
+}

@@ -91,10 +91,6 @@ function goToRodape(height) {
     });
 }
 
-function scrollToAnchor(aid) {
-    $('html, body').animate({ scrollTop: $("#" + aid).offset().top }, 1000);
-}
-
 function execTimer(seg, pageControl) {
     timer = setTimeout("execTimer(" + seg + ")", seg);
     //setTimeout("goToRodape(@activeRoll)", 30000);
@@ -339,7 +335,7 @@ function OnContentLoaded(e) {
     LoadingPanel.Hide();
 }
 
-function LoadMainPopupUrl(name, url, refreshGrid = '', height = 520, width = 940, title = '') {
+function LoadMainPopupUrl(name, url, refreshGrid = '', height = 520, width = 940, title='') {
     showPopup = true;
     if (refreshGrid != "") {
     }
@@ -347,8 +343,8 @@ function LoadMainPopupUrl(name, url, refreshGrid = '', height = 520, width = 940
     mainPopupControl[name].SetHeaderText(title);
     mainPopupControl[name].SetContentUrl(url);
     mainPopupControl[name].SetHeight(height);
-    mainPopupControl[name].SetWidth(width);
-    mainPopupControl[name].Focus();
+    mainPopupControl[name].SetWidth(width);    
+	mainPopupControl[name].Focus();
 }
 
 function OnButtonClick(s, e) {
@@ -356,9 +352,4 @@ function OnButtonClick(s, e) {
     showPopup = true;
     mainPopupControl[uiName].Show();
     mainPopupControl[uiName].SetContentUrl(url.GetText());
-}
-
-function scrollToAnchor(aid) {
-    var aTag = $("#" + aid);
-    $('html,body').animate({ scrollTop: aTag.offset().top }, 'slow');
 }

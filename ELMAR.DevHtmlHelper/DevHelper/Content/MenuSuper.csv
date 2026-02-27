@@ -1,0 +1,11 @@
+1000;1000;Administracao;App;Login;;;true;true;;ViewFile:Usuarios
+1002;1000;Usuarios;App;Login;;;true;true;;ViewFile:Usuarios
+1005;1000;Perfis;App;Login;;;true;true;;ViewFile:Perfis
+1010;1000;Contextos;App;Login;;;true;true;;ViewFile:Contextos
+1015;1000;Chamadas;App;Login;;;true;true;;ViewFile:Chamadas
+1020;1000;Permissoes Perfil;App;Login;;;true;true;;ViewFile:PerfilAutoriza
+1025;1000;Permissoes Usuario;App;Login;;;true;true;;ViewFile:UsuarioAutoriza
+1030;1000;Parametros;App;Login;;;true;true;;ViewFile:Parametros
+1100;1100;Acesso;;;;;true;true;;ViewFile:Usuarios
+1032;1100;Alterar Senha;App;Login;;;true;true;;ViewFile:AlterarSenha:isPartial:false
+1035;1100;Sair;Usuario;Logout;;;true;true;;

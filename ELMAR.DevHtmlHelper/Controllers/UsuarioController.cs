@@ -12,7 +12,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
 {
     public class UsuarioController : AppController
     {
-        private readonly FwkContexto _contexto = new FwkContexto("201082");
+        private readonly FwkContexto _contexto = new FwkContexto();
         public string loginUrl = FwkConfig.GetSettingValue("pathApp") + ConfigurationManager.AppSettings["loginUrl"];
 
         /// <summary>

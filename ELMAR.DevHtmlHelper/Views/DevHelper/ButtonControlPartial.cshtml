@@ -1,7 +1,4 @@
-﻿@{ 
-    string CTX = ViewBag.CTX;
-}
-@Html.DevExpress().Button(
+﻿@Html.DevExpress().Button(
 settings => {
     settings.Name = ViewBag.Name;
     settings.Text = ViewBag.Titulo;
@@ -13,7 +10,7 @@ settings => {
     {
         ELMAR.DevHtmlHelper.Models.UsuarioAutorizacao userAut = null;
         //ELMAR.DevHtmlHelper.Models.Usuario sessionUser = (ELMAR.DevHtmlHelper.Models.Usuario)Session["USUARIO"];
-        settings.Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, Contexto: CTX);
+        settings.Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, string.Empty);
         settings.ToolTip = userAut.Info;
         settings.ClientVisible = settings.Enabled;
     }

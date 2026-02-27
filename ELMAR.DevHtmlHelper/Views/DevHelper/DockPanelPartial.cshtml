@@ -25,9 +25,10 @@
     }
 }
 
-@Html.DevExpress().DockPanel(settings => {
-    settings.Name = "dockPanel"+ViewBag.Name;
-    settings.OwnerZoneUID = "dockZone_"+ViewBag.Name;
+@Html.DevExpress().DockPanel(settings =>
+{
+    settings.Name = "dockPanel" + ViewBag.Name;
+    settings.OwnerZoneUID = "dockZone_" + ViewBag.Name;
     settings.HeaderText = ViewBag.Titulo;
     settings.Height = Altura_dockPanel;
     settings.Width = Largura_dockPanel;
@@ -49,7 +50,7 @@
     {
         //TODO: Adicionar validação para links a partir de Actions internas
         settings.ContentUrl = ViewBag.Url;
-        settings.Style.Add("overflow","hidden");
+        settings.Style.Add("overflow", "hidden");
     }
     else if (!string.IsNullOrEmpty(ViewBag.PViewName))
     {
@@ -72,7 +73,7 @@
     else
     {
         //Validando a autorização antes de exibir o resultado da Action
-        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, CTX);
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, "", Contexto:CTX);
         if (Enabled)
         {
             settings.SetContent(() =>
@@ -82,7 +83,8 @@
                 );
             });
         }
-        else {
+        else
+        {
             //Exibe a tela padrão para efetuar o Login
             if (ViewBag.LoginUrl.Contains("cshtml"))
             {
@@ -101,14 +103,15 @@
                 string SchemeAndHost = url.Scheme + "://" + url.Authority;
                 string redirect = SchemeAndHost + HttpContext.Current.Request.Url.AbsolutePath;
                 //this.Url.Action(ViewBag.Action, ViewBag.Controller, (RouteValueDictionary)ViewBag.Params);
-                Response.Redirect(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session)+(string)ViewBag.LoginUrl+"?Result="+(userAut.Info.Replace("\n","").Replace("\r",""))+"&RedirectTo="+redirect+"&ctx="+CTX+"&e="+CTX);
+                Response.Redirect(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session) + (string)ViewBag.LoginUrl + "?Result=" + (userAut.Info.Replace("\n", "").Replace("\r", "")) + "&RedirectTo=" + redirect + "&ctx=" + CTX + "&e=" + CTX);
                 //settings.ContentUrl = ViewBag.LoginUrl;
             }
         }
     }
 }).GetHtml()
-@Html.DevExpress().DockZone(settings => {
-    settings.Name = "dockZone_"+ViewBag.Name;
+@Html.DevExpress().DockZone(settings =>
+{
+    settings.Name = "dockZone_" + ViewBag.Name;
     settings.Height = Altura_dockPanel;
     settings.Width = Largura_dockPanel;
     if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))

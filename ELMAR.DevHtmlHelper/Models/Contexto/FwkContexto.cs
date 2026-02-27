@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
-using DeviceDetectorNET;
 using Npgsql;
 using Z.EntityFramework.Plus;
 

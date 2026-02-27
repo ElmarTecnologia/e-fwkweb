@@ -1,14 +1,14 @@
 ﻿@model ELMAR.DevHtmlHelper.Models.Usuario
 <!--<h3>Alterar Senha</h3>-->
 @using (Html.BeginForm("AlterarSenha", "Usuario"))
-{ 
+{
     @Html.HiddenFor(model => model.Codigo)
     @Html.HiddenFor(model => model.Email)
     @Html.HiddenFor(model => model.Login)
     @Html.Hidden("Perfil", (string)ViewBag.Perfil)
     @Html.Hidden("RedirectTo", (string)ViewBag.RedirectTo)
     @Html.Hidden("isPartial", (bool)ViewBag.isPartial)
-    
+
     <p>Login: @ViewBag.Login</p>
     <text>Nova Senha:</text>
     <p>@Html.Password("Senha") @Html.ValidationMessageFor(model => model.Senha)</p>
@@ -21,8 +21,12 @@
     }
     else
     {
-        <input type="submit" value="SALVAR" onclick="return confirmarAcao('')"/>  
+        <input type="submit" value="SALVAR" onclick="return confirmarAcao('')" />
+
     }
 }
-
-
+<style>
+    input {
+        border: 2px solid #ccc;
+    }
+</style>
