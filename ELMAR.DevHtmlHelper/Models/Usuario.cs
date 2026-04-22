@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Routing;
-using System.Configuration;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
@@ -294,22 +293,17 @@ namespace ELMAR.DevHtmlHelper.Models
             HttpSessionStateBase Session = HttpContext.Session;
 
             //Define o contexto na sessão
-            string CTX = Core.GetSetCTX(HttpContext, Contexto);
+            var CTX = string.IsNullOrEmpty(Contexto) ? Core.GetSetCTX(HttpContext, Contexto, useDefaultCTX:true) : Contexto;
+            Session["CTX"] = CTX;
 
             userAutorizacao = new UsuarioAutorizacao();
 
             //Completa o endereçamento completo
             CustomLogin = !CustomLogin.Contains("http") ? FwkConfig.GetSettingValue("pathApp").ToString() + CustomLogin : CustomLogin; 
 
-            #region Tabela de Autorizações Temporária - Session 
-            //(Esvaziada ao perder sessão ou efetuar logoff)
-            /*if (Session["AUTHORIZETABLE"] == null)
-                Session["AUTHORIZETABLE"] = new List<string>();
-            if (((List<string>)Session["AUTHORIZETABLE"]).Contains(Chamada))
-                return true;*/
-            #endregion
-
             Usuario sessionUser = (ELMAR.DevHtmlHelper.Models.Usuario)Session["USUARIO"];
+            if (sessionUser != null && Session["PERFIL"] == null)
+                Session["PERFIL"] = sessionUser.Contextos.First().Perfil.Titulo;
 
             //Verifica a existência da Chamada
             //Chamada: "/Controller/Action"
@@ -427,17 +421,17 @@ namespace ELMAR.DevHtmlHelper.Models
                 chamada = CustomCall;
             }
             Contexto = ((!string.IsNullOrEmpty(HttpContext.Request.QueryString["CTX"])) ? HttpContext.Request.QueryString["CTX"] : string.Empty);
-            /*if (string.IsNullOrEmpty(Contexto))
-            {
-                Contexto = CTX;
-            }*/
             if (string.IsNullOrEmpty(Contexto))
             {
                 Contexto = ((!string.IsNullOrEmpty(HttpContext.Request.QueryString["ecode"])) ? HttpContext.Request.QueryString["ecode"] : HttpContext.Request.QueryString["e"]);
             }
             if (string.IsNullOrEmpty(Contexto))
             {
-                Contexto = ConfigurationManager.AppSettings["defaultCTX"];
+                Contexto = ((!string.IsNullOrEmpty(HttpContext.Request.QueryString["e"])) ? HttpContext.Request.QueryString["e"] : HttpContext.Request.QueryString["e"]);
+            }
+            if (string.IsNullOrEmpty(Contexto))
+            {
+                Contexto = CTX; //ConfigurationManager.AppSettings["defaultCTX"];
             }
             return VerificaAutorizacao(out userAutorizacao, chamada, HttpContext, absoluteUri, CustomLogin, Contexto);
         }

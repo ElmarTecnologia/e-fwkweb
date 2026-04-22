@@ -68,7 +68,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
                 case "Login":
                     //Reinicia as variáveis de sessão
                     //Não reseta o CONTEXTO para permitir logar com outras credenciais posteriormente
-                    Session["USER"] = Session["USER_ID"] = Session["PERFIL"] = null;
+                    Session["USER"] = Session["USER_ID"] = Session["PERFIL"] = Session["USUARIO"] = Session["TOKEN"] = null ;
                     break;
                 case "SelecionarContexto":
                     Usuario usuario = new Usuario().GetUsuario(base.Session["USER"].ToString());
@@ -207,7 +207,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
             }            
 
             //Definindo o redirecionamento
-            if(Core.GetSetCTX(HttpContext) != null && !string.IsNullOrEmpty(Core.GetSetCTX(HttpContext)))
+            if(Core.GetSetCTX(HttpContext, useDefaultCTX:true) != null && !string.IsNullOrEmpty(Core.GetSetCTX(HttpContext, useDefaultCTX: true)))
                 RedirectTo = (string.IsNullOrEmpty(RedirectTo) && usuario != null && usuario.getCtxUsuPerfil(Core.GetSetCTX(HttpContext)) != null) ? usuario.getCtxUsuPerfil(Core.GetSetCTX(HttpContext)).RedirectTo : RedirectTo;                
             
             //Nâo permite que o RedirectTo permaneça vazio
@@ -236,7 +236,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
                             }
                         } 
                         // 2º Tenta definir o contexto Default 
-                        else if ((Core.GetSetCTX(HttpContext).Equals(string.Empty) || Core.GetSetCTX(HttpContext).Equals(string.Empty))
+                        else if ((Core.GetSetCTX(HttpContext, useDefaultCTX:true).Equals(string.Empty) || Core.GetSetCTX(HttpContext, useDefaultCTX: true).Equals(string.Empty))
                             && !ConfigurationManager.AppSettings["defaultCTX"].ToString().Equals(String.Empty))
                         {
                             if (usuario.possuiContexto(ConfigurationManager.AppSettings["defaultCTX"].ToString()))
@@ -252,7 +252,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
                         else
                         { 
                             //Pega os contexto(s) do usuário (alcada), caso o contexto não tenha sido fornecido por FORÇA
-                            if (Core.GetSetCTX(HttpContext).Equals(string.Empty) || Core.GetSetCTX(HttpContext).Equals(string.Empty))
+                            if (Core.GetSetCTX(HttpContext, useDefaultCTX: true).Equals(string.Empty) || Core.GetSetCTX(HttpContext, useDefaultCTX: true).Equals(string.Empty))
                             {
                                 if (usuario.getContextos().Count > 1)
                                 {
@@ -276,10 +276,10 @@ namespace ELMAR.DevHtmlHelper.Controllers
                         }
 
                         //EFETUA O LOGIN NA SESSÃO, SOMENTE COM A DEFINIÇÃO DO CONTEXTO
-                        if (Core.GetSetCTX(HttpContext) != null && !string.IsNullOrEmpty(Core.GetSetCTX(HttpContext)))
+                        if (Core.GetSetCTX(HttpContext, useDefaultCTX: true) != null && !string.IsNullOrEmpty(Core.GetSetCTX(HttpContext, useDefaultCTX: true)))
                         {
                             //Pega o primeiro PERFIL do CTX selecionado
-                            List<UsuarioPerfil> usuCtxPerfis = usuario.getCtxUsuPerfis(Core.GetSetCTX(HttpContext));
+                            List<UsuarioPerfil> usuCtxPerfis = usuario.getCtxUsuPerfis(Core.GetSetCTX(HttpContext, useDefaultCTX: true));
 
                             UsuarioPerfil usuPer = null;
                             if (usuCtxPerfis.Count > 0)

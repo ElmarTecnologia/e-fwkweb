@@ -30,6 +30,7 @@ using Hanssens.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using ELMAR.DevHtmlHelper.Models.Extensions;
+using DevExpress.DashboardWeb.Native;
 
 namespace ELMAR.DevHtmlHelper.Models
 {
@@ -1686,7 +1687,8 @@ namespace ELMAR.DevHtmlHelper.Models
 
         public static string CreateCookie(HttpContextBase Context, string value, string key = "CTX")
         {
-            var mobile = Util.IsMobileDevice(Context.Request) ? "mobile" : "";
+            //var mobile = Util.IsMobileDevice(Context.Request) ? "mobile" : "";
+            var mobile = string.Empty;
             string cookieName = Util.ConvertToAlphaNumeric(ConfigurationManager.AppSettings["appName"]) + "_Cookie" + mobile;
             //key = !(key.Contains(cookieName)) ? cookieName + "_" + key : key;            
 
@@ -1739,40 +1741,7 @@ namespace ELMAR.DevHtmlHelper.Models
 
             Context.Session["CTX"] = Valor;
 
-            return Valor;
-
-            // Código em desuso 
-            /*string currentValor = string.Empty;
-            try
-            {
-                var mobile = Util.IsMobileDevice(Context.Request) ? "mobile" : "";
-
-                string cookieName = Util.ConvertToAlphaNumeric(ConfigurationManager.AppSettings["appName"]) + "_Cookie" + mobile;
-                //key = !key.Contains(cookieName) ? cookieName + "_" + key : key;
-
-                currentValor = Context.Request.Cookies[cookieName] != null
-                    && Context.Request.Cookies[cookieName].Values[key] != null ?
-                    Context.Request.Cookies[cookieName].Values[key] : string.Empty;
-
-                if (!string.IsNullOrEmpty(Valor) && !Valor.Equals(currentValor))
-                {
-                    // store any object
-                    currentValor = CreateCookie(Context, Valor, key);
-                }
-
-                Context.Session[key] = currentValor;
-            }
-            finally {
-                if (!string.IsNullOrEmpty(Valor))
-                {
-                    // store any object
-                    Context.Session[key] = Valor;
-                    currentValor = Valor;
-                }
-            }
-
-            return currentValor;
-            */
+            return Valor;            
         }
 
         public static string GetSetCTX_LocalStorage(String ctx = null, string Key = "CTX", bool useDefaultCTX = false)

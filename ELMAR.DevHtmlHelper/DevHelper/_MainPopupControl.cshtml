@@ -27,7 +27,6 @@
     settings.SettingsAdaptivity.VerticalAlign = PopupAdaptiveVerticalAlign.WindowTop;
     settings.SettingsAdaptivity.MaxWidth = System.Web.UI.WebControls.Unit.Pixel(650);
     settings.SettingsAdaptivity.MinHeight = Altura.Value >= 650 ? System.Web.UI.WebControls.Unit.Pixel(650) : Altura;
-    //settings.CloseAction = ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request) ? CloseAction.CloseButton : CloseAction.OuterMouseClick;
     settings.CloseAction = CloseAction.CloseButton;
     settings.ClientSideEvents.Init = "OnPopupInit";
     settings.ClientSideEvents.Shown = "OnPopupShown";
