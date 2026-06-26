@@ -116,7 +116,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
             };
             //Sem teste de envio
             string result = string.Empty;
-            MailHelper.Send();
+            MailHelper.Send(out string sendResult, true);
             result = MailHelper.Result;
             ViewBag.Result = result;
 
@@ -146,15 +146,16 @@ namespace ELMAR.DevHtmlHelper.Controllers
         [FwkAuthorize]    
         public async Task<ActionResult> SendMail(string server, string port, string user, string pass, string ssl, string sender, string assunto, string conteudo, string destino, string redirect="")
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             MailHelper mailHelper = new MailHelper(server, port, user, pass, ssl, sender);
             mailHelper.Recipient = destino;
             mailHelper.RecipientCC = null;
             mailHelper.Subject = assunto;
             mailHelper.Body = conteudo;
-            string result = mailHelper.Send().ToString();
+            mailHelper.Send(out string sendResult, true);
             if (!string.IsNullOrEmpty(redirect))
-                return Redirect(redirect+"?result="+result);
-            return Content(result);
+                return Redirect(redirect+"?result="+ sendResult);
+            return Content(sendResult);
         }
         
         //TODO: Implementar sobrecarga obtendo o nome a partir de um repositório de arquivos do FWK

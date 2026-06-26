@@ -870,8 +870,8 @@ namespace ELMAR.DevHtmlHelper.Controllers
                 TempData["SessionModel" + gridName + CTX] = dtSource;
             }
 
-            var settings = new GridViewSettingsHelper(dtSource, gridName, gridTitulo, sqlCode, gridKey, tamPagina, Tema, Controller, Action, Filtros, Agrupadores, Expanded, Totalizadores, ColunasOcultas, ColunasActions, ColunasDateTime, ColunasCurrency, ExportHeaderText).ExportGridViewSettings;                       
-
+            var settings = new GridViewSettingsHelper(dtSource, gridName, gridTitulo, sqlCode, gridKey, tamPagina, Tema, Controller, Action, Filtros, Agrupadores, Expanded, Totalizadores, ColunasOcultas, ColunasActions, ColunasDateTime, ColunasCurrency, ExportHeaderText).ExportGridViewSettings;
+            
             switch (OutputFormat.ToUpper())
             {
                 case "CSV":

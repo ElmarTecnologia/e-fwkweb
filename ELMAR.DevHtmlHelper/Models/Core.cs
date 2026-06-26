@@ -1739,7 +1739,8 @@ namespace ELMAR.DevHtmlHelper.Models
             Valor = string.IsNullOrEmpty(Valor) ?
                 Context.Request["e"] : Valor;
 
-            Context.Session["CTX"] = Valor;
+            Valor = string.IsNullOrEmpty(Valor) && Context.Session["CTX"] != null ?
+                Context.Session["CTX"].ToString() : Valor;
 
             return Valor;            
         }

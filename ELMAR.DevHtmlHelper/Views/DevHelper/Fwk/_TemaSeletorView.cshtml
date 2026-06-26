@@ -24,7 +24,8 @@ else
 {
     <form class="customForm" action="#" name="_seletorTemaView" method="get"
           onsubmit="this.DXScript.value=''; this.DXCss.value=''; CallbackPanel.PerformCallback();">
-        <select name="Tema" style="width:225px;border-radius:3px;">
+		<input type="hidden" name="ctx" value='@(Request["e"] ?? Request["ctx"])'/>
+        <select name="Tema" style="width:225px;border-radius:3px;" onChange="_seletorTemaView.submit()">
             @{
                 string Tema = !string.IsNullOrEmpty(Request["Tema"]) ? Request["Tema"] : ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("DefaultTheme", Session);
             }
@@ -35,6 +36,6 @@ else
                 <option value="@item" @selected>@descTema</option>
             }
         </select>
-        <input type="submit" style="font-size:12px;height:19px;padding:2px;float:left;width:225px;margin-left:5px" value="Aplicar Tema" />
+        <!--<input type="submit" style="font-size:12px;height:19px;padding:2px;float:left;width:225px;margin-left:5px" value="Aplicar Tema" />-->
     </form>
 }

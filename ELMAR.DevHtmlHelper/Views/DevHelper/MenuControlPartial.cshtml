@@ -52,6 +52,7 @@
                 routeValues.Add("Controller", menuItem.Controller);
                 routeValues.Add("Action", menuItem.Action);
                 routeValues.Add("e", CTX);
+                routeValues.Add("ctx", CTX);
                 //Adicionando parâmetros dinâmicos
                 foreach (var param in (Dictionary<string, object>)ELMAR.DevHtmlHelper.Models.Core.GetRouteParameters(menuItem.RouteParameters, "ctx", CTX))
                 {
@@ -102,6 +103,7 @@
                             routeValues2.Add("Controller", submenuItem.Controller);
                             routeValues2.Add("Action", submenuItem.Action);
                             routeValues2.Add("e", CTX);
+                            routeValues2.Add("ctx", CTX);
                             //Adicionando parâmetros dinâmicos
                             foreach (var param in ELMAR.DevHtmlHelper.Models.Core.GetRouteParameters(submenuItem.RouteParameters, "ctx", CTX))
                             {

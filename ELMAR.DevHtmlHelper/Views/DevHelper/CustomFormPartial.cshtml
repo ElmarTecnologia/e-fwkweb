@@ -7,7 +7,7 @@
     }
 }
 <form class="customForm" action="@ViewBag.Action" name="@ViewBag.Name" id="@ViewBag.Name" onsubmit="@onSubmit" method="@ViewBag.Method" target="@ViewBag.Target" enctype="multipart/form-data">
-    <input type="hidden" id="formName" name="formName" value="@ViewBag.Name">
+    <input type="hidden" id="formName" name="formName" value="@ViewBag.Name"/>
     @foreach (string name in formFields)
     {
         string[] param = name.Split('|');
@@ -72,6 +72,7 @@
                     settings.ClientVisible = !type.Equals("hidden");
                     settings.Style.Add("float", "left");
                     settings.Style.Add("margin", "10px 0 0 0");
+                    settings.Style.Add("height", "30px");
                     settings.Theme = ViewBag.Tema;
                     settings.Properties.NullText = param[0];
                     //settings.Properties.ClientSideEvents.Validation = "OnNameValidation";
@@ -87,7 +88,8 @@
                 settings.Theme = ViewBag.Tema;
                 settings.Style.Add("float", "left");
                 settings.Style.Add("margin", "10px 0 0 0");
-                 if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
+                settings.Style.Add("height", "30px");
+                if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
                 {
                     settings.Style.Add("width", "140px");
                 }

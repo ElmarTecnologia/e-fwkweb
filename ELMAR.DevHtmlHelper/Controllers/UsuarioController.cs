@@ -405,6 +405,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
         [FwkAuthorize(CustomCall = "/Usuario/EnviarSenha"), System.Web.Mvc.HttpPost]
         public ActionResult EnviarSenha(String Login, String inputSenha, String Perfil="", String Email = "", String RedirectTo = "", bool PreLogin = false, String Codigo = "", String Sender = "")
         {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             //Verificar a existência do Usuário 
             //-> Default: Não checa o contexto. Quando o perfil for vazio, checa pelo login e CTX)
             Usuario usuario = null;
@@ -470,20 +471,13 @@ namespace ELMAR.DevHtmlHelper.Controllers
             };
 
             bool sucesso;
-            try
-			{
-                this._contexto.SaveChanges();
-                sucesso = MailHelper.Send();
-			}
-			catch
-			{
-                return JavaScript("Erro no processo de alteração da senha");
-			}
+            this._contexto.SaveChanges();
+            sucesso = MailHelper.Send(out string sendResult, true);
 
             if(sucesso)
                 return JavaScript("O link para troca de senha foi enviado para seu e-mail, ao acessar o sistema será necessário alterá-la.");            
             else 
-                return JavaScript("Falha no envio do email, tente novamente mais tarde...");            
+                return JavaScript(sendResult);            
         }        
 
         [FwkAuthorize(CustomCall = "/Usuario/AlterarSenha"), HttpPost]

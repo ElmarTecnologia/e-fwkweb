@@ -52,6 +52,8 @@ settings =>
     settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
     settings.EnableTabScrolling = true;
     //settings.ClientSideEvents.TabClick = "";
+	//settings.Style.Add("width", "100%");
+	//settings.Style.Add("overflow", "auto");
     if (!string.IsNullOrEmpty(ViewBag.CallbackController) && !string.IsNullOrEmpty(ViewBag.CallbackAction))
     {
         //settings.CallbackRouteValues = new { Controller = ViewBag.CallbackController, Action = ViewBag.CallbackAction, Tema = ViewData["Tema"].ToString(), isPartial = true, ctx = Model != null ? (string)Model : null };

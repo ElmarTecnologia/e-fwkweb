@@ -25,33 +25,62 @@
 }
 @if (ViewBag.returnType.ToLower().Equals("grid"))
 {
-        @Html.Action("GridViewPartial", "DevHelper", new
-   {
-       dtSource = ViewData["dtSource_" + ViewBag.module],
-       sqlCode = ViewData["sqlCode_" + ViewBag.module],
-       gridName = ViewBag.module,
-       gridTitulo = ViewData["gridTitulo_" + ViewBag.module],
-       gridKey = ViewData["gridKey_" + ViewBag.module],
-       Tema = ViewData["Tema"],
-       tamPagina = ViewData["tamPagina_" + ViewBag.module],
-       ColunasOcultas = ViewData["ColunasOcultas_" + ViewBag.module],
-       ColunasLinks = ViewData["ColunasLinks_" + ViewBag.module],
-       Totalizadores = ViewData["Totalizadores_" + ViewBag.module],
-       ColunasCurrency = ViewData["ColunasCurrency_" + ViewBag.module],
-       Agrupadores = ViewData["Agrupadores_" + ViewBag.module],
-       Expanded = ViewData["Expanded_" + ViewBag.module],
-       ExibeExportador = ViewData["ExibeExportador_" + ViewBag.module],
-       ExibeAgrupador = ViewData["ExibeAgrupador_" + ViewBag.module],
-       ExibeLinhaFiltro = ViewData["ExibeLinhaFiltro_" + ViewBag.module],
-       DetailAction = ViewData["DetailAction_" + ViewBag.module],
-       ColunasActions = ViewData["ColunasActions_" + ViewBag.module],
-       InfoColunas = ViewData["InfoColunas_" + ViewBag.module],
-       Info = ViewData["Info_" + ViewBag.module],
-       ExportHeaderText = ViewData["ExportHeaderText_" + ViewBag.module],
-       CTX = ViewData["CTX_" + ViewBag.module],
-       autoScroll = true,
-       Largura = "100%"
-   })    
+@Html.DevExpress().DockPanel(
+                settings =>
+                    {
+                settings.Name = "pcModalModeExport";
+                settings.OwnerZoneUID = "dockZone_pcModalModeExport";
+                settings.AllowDragging = false;
+                settings.AllowResize = false;
+                settings.PopupAnimationType = AnimationType.None;
+                settings.ShowCloseButton = false;
+                settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+                settings.Height = System.Web.UI.WebControls.Unit.Pixel(1000);
+                settings.Theme = ViewBag.Tema;
+                settings.Style.Add("overflow", "hidden");
+                settings.Style.Add("min-height", "640px");
+                settings.HeaderText = (string)ViewData["Titulo"];
+                settings.ScrollBars = System.Web.UI.WebControls.ScrollBars.None;
+                settings.SetContent(() =>
+                {
+                ViewContext.Writer.Write(
+				   Html.Action("GridViewPartial", "DevHelper", new
+				   {
+					   dtSource = ViewData["dtSource_" + ViewBag.module],
+					   sqlCode = ViewData["sqlCode_" + ViewBag.module],
+					   gridName = ViewBag.module,
+					   gridTitulo = ViewData["gridTitulo_" + ViewBag.module],
+					   gridKey = ViewData["gridKey_" + ViewBag.module],
+					   Tema = ViewData["Tema"],
+					   tamPagina = ViewData["tamPagina_" + ViewBag.module],
+					   ColunasOcultas = ViewData["ColunasOcultas_" + ViewBag.module],
+					   ColunasLinks = ViewData["ColunasLinks_" + ViewBag.module],
+					   Totalizadores = ViewData["Totalizadores_" + ViewBag.module],
+					   ColunasCurrency = ViewData["ColunasCurrency_" + ViewBag.module],
+					   Agrupadores = ViewData["Agrupadores_" + ViewBag.module],
+					   Expanded = ViewData["Expanded_" + ViewBag.module],
+					   ExibeExportador = ViewData["ExibeExportador_" + ViewBag.module],
+					   ExibeAgrupador = ViewData["ExibeAgrupador_" + ViewBag.module],
+					   ExibeLinhaFiltro = ViewData["ExibeLinhaFiltro_" + ViewBag.module],
+					   DetailAction = ViewData["DetailAction_" + ViewBag.module],
+					   ColunasActions = ViewData["ColunasActions_" + ViewBag.module],
+					   InfoColunas = ViewData["InfoColunas_" + ViewBag.module],
+					   Info = ViewData["Info_" + ViewBag.module],
+					   ExportHeaderText = ViewData["ExportHeaderText_" + ViewBag.module],
+					   CTX = ViewData["CTX_" + ViewBag.module],
+					   autoScroll = true,
+					   Largura = "100%"
+				   }).ToHtmlString()
+				);
+                });
+                }).GetHtml()
+                @Html.DevExpress().DockZone(settings =>
+                {
+            settings.Name = "dockZone_pcModalModeExport";
+            settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            settings.Height = System.Web.UI.WebControls.Unit.Percentage(100);
+            settings.AllowGrowing = true;
+            }).GetHtml()            
 }
 else
 {

@@ -1,14 +1,16 @@
-﻿using System;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using System;
 using System.Configuration;
-using System.IO;
 using System.Net;
-using System.Net.Mail;
+using System.Security;
 
 namespace ELMAR.DevHtmlHelper.Models
 {
     public class MailHelper
     {
-        private const int Timeout = 180000;
+        //private const int Timeout = 180000;
         private readonly string _host;
         private readonly int _port;
         private readonly string _user;
@@ -64,9 +66,7 @@ namespace ELMAR.DevHtmlHelper.Models
             try
             {
 
-                // We do not catch the error here... let it pass direct to the caller
-                Attachment att = null;
-                //var message = new MailMessage(Sender, Recipient, Subject, Body) { IsBodyHtml = true };
+                /*Attachment att = null;
                 var message = new MailMessage() { From = new MailAddress(Sender, DisplayName), Subject = Subject, Body = Body, IsBodyHtml = true };
                 //Adding the ReplyTo Address
                 if(!string.IsNullOrEmpty(ReplyTo))
@@ -93,7 +93,9 @@ namespace ELMAR.DevHtmlHelper.Models
                     }
                     //message.Bcc.Add(RecipientCC);
                 }
-                var smtp = new SmtpClient(_host, _port);
+                */
+
+                /*var smtp = new SmtpClient(_host, _port);
 
                 if (!String.IsNullOrEmpty(AttachmentFile))
                 {
@@ -110,23 +112,112 @@ namespace ELMAR.DevHtmlHelper.Models
                     smtp.Credentials = new NetworkCredential(_user, _pass);
                     smtp.EnableSsl = _ssl;
                 }
+                */
 
-                smtp.Send(message);
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(DisplayName, Sender));
+                message.To.Add(new MailboxAddress(null, Recipient));
+                if (RecipientCC != null)
+                    message.Cc.Add(new MailboxAddress(RecipientCC, RecipientCC));
+                message.Subject = Subject;
+                message.Body = new TextPart("html")
+                {
+                    Text = Body
+                };
+
+                using (var client = new SmtpClient())
+                {
+                    // For demo-purposes, accept all SSL certificates (in case the server supports STARTTLS)
+                    client.ConnectAsync(_host, _port, _ssl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.None);
+
+                    var securePassword = new SecureString();
+
+                    foreach (char c in _pass)
+                        securePassword.AppendChar(c);
+
+                    securePassword.MakeReadOnly();
+
+                    var creds = new NetworkCredential(_user, securePassword);
+
+                    client.AuthenticateAsync(creds);
+
+                    client.Send(message);
+
+                    client.DisconnectAsync(true);
+                }
+
+                //smtp.Send(message);
                 this.Result = "Mensagem enviada com sucesso";
 
-                if (att != null)
-                    att.Dispose();
+                //if (att != null)
+                //    att.Dispose();
+
                 message.Dispose();
-                smtp.Dispose();
+
+                //smtp.Dispose();
             }
 
             catch (Exception ex)
             {
                 ok = false;
-                this.Result = "Falha no envio da mensagem.";
+                this.Result = "Falha no envio do email.";
                 if (debug) //Detalhes técnicos exibidos apenas em modo debug
                     this.Result += " Detalhes: " + ex.Message;
             }
+
+            return ok;
+        }
+
+        public bool Send(out string result, bool debug = false)
+        {
+            bool ok = true;
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(DisplayName, Sender));
+                message.To.Add(new MailboxAddress(null, Recipient));
+                if(RecipientCC != null)
+                    message.Cc.Add(new MailboxAddress(RecipientCC, RecipientCC));
+                message.Subject = Subject;
+                message.Body = new TextPart("html")
+                {
+                    Text = Body
+                };
+
+                using (var client = new SmtpClient())
+                {
+                    client.Connect(_host, _port, _ssl ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.None);
+
+                    var securePassword = new SecureString();
+
+                    foreach (char c in _pass)
+                        securePassword.AppendChar(c);
+
+                    securePassword.MakeReadOnly();
+
+                    var creds = new NetworkCredential(_user, securePassword);
+
+                    client.Authenticate(creds);
+                    
+                    client.Send(message);
+
+                    client.Disconnect(true);
+                }
+
+                this.Result = "Mensagem enviada com sucesso";
+
+                message.Dispose();
+            }
+
+            catch (Exception ex)
+            {
+                ok = false;
+                this.Result = "Falha no envio do email.";
+                if (debug) //Detalhes técnicos exibidos apenas em modo debug
+                    this.Result += " Detalhes: " + ex.Message;
+            }
+
+            result = this.Result;
 
             return ok;
         }

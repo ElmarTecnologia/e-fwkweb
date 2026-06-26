@@ -38,7 +38,6 @@
     settings.AllowDragging = true;
     settings.ShowOnPageLoad = ViewBag.isMessageBox ? true : ViewBag.ShowOnPageLoad;
     settings.ShowCloseButton = true;
-    //settings.CloseAction = ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request) ? CloseAction.CloseButton : CloseAction.OuterMouseClick;
     settings.CloseAction = CloseAction.CloseButton;
     settings.HeaderText = (string)ViewBag.Titulo;
     settings.Height = Altura;
@@ -133,7 +132,7 @@
             RouteParamsCallbackValues.Add("Controller", ViewBag.Controller);
         if (!RouteParamsCallbackValues.ContainsKey("Action"))
             RouteParamsCallbackValues.Add("Action", ViewBag.Action);
-        if (!(bool)ViewBag.OpenInFrame /*&& !ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request)*/)
+        if (!(bool)ViewBag.OpenInFrame)
         {
             RouteParamsCallbackValues.Add("UITarget", settings.Name);
             settings.LoadContentViaCallback = LoadContentViaCallback.OnFirstShow;

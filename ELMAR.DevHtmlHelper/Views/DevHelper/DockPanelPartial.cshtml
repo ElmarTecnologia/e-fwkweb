@@ -32,6 +32,8 @@
     settings.HeaderText = ViewBag.Titulo;
     settings.Height = Altura_dockPanel;
     settings.Width = Largura_dockPanel;
+	settings.AllowDragging = false;
+    settings.AllowResize = false;
     if (ELMAR.DevHtmlHelper.Models.Util.IsMobileDevice(Request))
     {
         settings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
@@ -73,7 +75,7 @@
     else
     {
         //Validando a autorização antes de exibir o resultado da Action
-        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, "", Contexto:CTX);
+        Enabled = ELMAR.DevHtmlHelper.Models.Usuario.VerificaAutorizacao(out userAut, "/" + ViewBag.Controller + "/" + ViewBag.Action, HttpContext.Current, "", Contexto: CTX);
         if (Enabled)
         {
             settings.SetContent(() =>
@@ -102,8 +104,9 @@
                 Uri url = new Uri(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp"));
                 string SchemeAndHost = url.Scheme + "://" + url.Authority;
                 string redirect = SchemeAndHost + HttpContext.Current.Request.Url.AbsolutePath;
+                redirect = WebUtility.UrlEncode(redirect);
                 //this.Url.Action(ViewBag.Action, ViewBag.Controller, (RouteValueDictionary)ViewBag.Params);
-                Response.Redirect(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session) + (string)ViewBag.LoginUrl + "?Result=" + (userAut.Info.Replace("\n", "").Replace("\r", "")) + "&RedirectTo=" + redirect + "&ctx=" + CTX + "&e=" + CTX);
+                Response.Redirect(ELMAR.DevHtmlHelper.Models.FwkConfig.GetSettingValue("pathApp", Session) + (string)ViewBag.LoginUrl + "?Result=" + (userAut.Info.Replace("\n", "").Replace("\r", "")) + "&ctx=" + CTX + "&e=" + CTX + "&RedirectTo=" + redirect);
                 //settings.ContentUrl = ViewBag.LoginUrl;
             }
         }

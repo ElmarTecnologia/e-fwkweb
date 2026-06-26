@@ -24,7 +24,7 @@
     settings.Name = (ViewData["chartName"] != null && (string)ViewData["chartName"] != "") ? (string)ViewData["chartName"] : (string)ViewData["chartTitulo"];
     settings.Theme = ViewBag.Tema;
     settings.Titles.Add(new ChartTitle() {
-        Font = new System.Drawing.Font("Tahoma", 14),
+        Font = new System.Drawing.Font("Tahoma", 12),
         Text = (string)ViewData["chartTitulo"]
     });
 
