@@ -252,8 +252,9 @@ namespace ELMAR.DevHtmlHelper.Models
                     ((IDisposable)ContentCSV).Dispose();
                 }
             }
-            ContentCSV.Close();
-            return dictionary.Values.ToList<Fwk_MenuItem>();
+            ContentCSV.Close();            
+
+            return dictionary.Values.OrderBy(x => x.Order).ToList<Fwk_MenuItem>();
         }
 
         public static List<Fwk_MenuItem> CarregaMenusCSV(string FilePathCSV, string saveMenuCtx = "")
