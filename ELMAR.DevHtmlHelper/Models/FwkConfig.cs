@@ -47,7 +47,7 @@ namespace ELMAR.DevHtmlHelper.Models
                 //Tratamento específico para a variável pathApp
                 if (Session != null && !string.IsNullOrEmpty(Chave) && Chave.Equals("pathApp"))
                 {
-                    string pathAppSubdir = !GetSettingValue("pathAppSubdir", CTX, Session, CTXField).Equals(string.Empty) ? "/" + GetSettingValue("pathAppSubdir", CTX, Session, CTXField) : string.Empty;
+                    string pathAppSubdir = !GetSettingValue("pathAppSubdir", CTX, Session, CTXField).Equals(string.Empty) ? "/" + GetSettingValue("pathAppSubdir", CTX, Session, CTXField) : "/";
                     return HttpContext.Current.Request.Url.Scheme + "://" + HttpContext.Current.Request.Url.Authority + pathAppSubdir;
                 }
 

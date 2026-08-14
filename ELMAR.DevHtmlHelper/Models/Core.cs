@@ -1732,7 +1732,6 @@ namespace ELMAR.DevHtmlHelper.Models
 
         public static string GetSetCookie(HttpContextBase Context, string Valor = "", string key = "CTX", bool useDefaultValue = false)
         {
-            //return GetSetCTX_LocalStorage(Valor, key, useDefaultValue);
             Valor = string.IsNullOrEmpty(Valor) ?
                 Context.Request["ctx"] : Valor;
 
@@ -1741,6 +1740,8 @@ namespace ELMAR.DevHtmlHelper.Models
 
             Valor = string.IsNullOrEmpty(Valor) && Context.Session["CTX"] != null ?
                 Context.Session["CTX"].ToString() : Valor;
+
+            Context.Session["CTX"] = Valor;
 
             return Valor;            
         }
@@ -1807,11 +1808,11 @@ namespace ELMAR.DevHtmlHelper.Models
                 ctx = hostCTX;
             }            
             
-            string defaultCTX = (useDefaultCTX) ? FwkConfig.GetSettingValue("defaultCTX") : string.Empty;
+            /*string defaultCTX = (useDefaultCTX) ? FwkConfig.GetSettingValue("defaultCTX") : string.Empty;
             if (string.IsNullOrEmpty(ctx) && !string.IsNullOrEmpty(defaultCTX))
             {
                 ctx = defaultCTX;
-            }
+            }*/
 
             return Core.GetSetCookie(Context, ctx, key, useDefaultCTX);
         }
