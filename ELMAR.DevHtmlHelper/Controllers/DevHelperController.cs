@@ -60,7 +60,10 @@ namespace ELMAR.DevHtmlHelper.Controllers
         /// <returns></returns>
         public ActionResult GridViewPartial(ViewDataDictionary ViewDataAct = null, IEnumerable dtSource = null, string sqlCode = "", string bdConnection = "ConexaoPgl", string assemblyDll = "", string gridName = "", string gridTitulo = "", string gridKey = "", string Tema = "Default", int tamPagina = 30, string Controller = "DevHelper", string Action = "GridViewPartial", string Filtros = "", string Agrupadores = "", string CustomAgrupadores = "", bool Expanded = true, string Totalizadores = "", string TotalizadoresGrp = "", string ColunasOcultas = "", string ColunasDateTime = "", string ColunasCurrency = "", string ColunasImage = "", string ColunasHtml = "", string ColunasLinks = "", string ColunasActions = "", string DetailAction = "", string CRUDActions = "", string OutputFormat = "HTML", bool ExibeLinhaFiltro = true, bool PersonalizarFiltro = true, string Info = "", string Altura = "100%", string Largura = "100%", bool ExibeExportador = true, string ExportadorPosicao = "Rodape", string ExportHeaderText = "", bool ExibeAgrupador = true, bool isCallBack = false, bool refreshData = true, bool autoScroll = true, string CTX = "", bool ShowSelectCheckbox = false, string SelectRowMode = "Single", bool customGrouping = false, bool reloadData = false, string CallbackRoute = "", string InfoColunas = "", string selectedIDs = "", bool showFooter = true, bool adaptativeMode = false, int Tab = -1, int page = 1)
         {
-            string viewFile = "DevHelper/GridViewPartial";
+            //Permite ativar o grid DevExtreme (migração gradual) via appSetting "UseDevExtremeGrid"
+            string viewFile = string.Equals(FwkConfig.GetSettingValue("UseDevExtremeGrid"), "true", StringComparison.OrdinalIgnoreCase)
+                ? "DevHelper/GridViewPartial.DevExtreme"
+                : "DevHelper/GridViewPartial";
             string nameUI = (!string.IsNullOrEmpty(gridName)) ? Regex.Replace(gridName, "[^0-9a-zA-Z]+", "") : Regex.Replace(gridTitulo, "[^0-9a-zA-Z]+", "");
 
             /*if (isCallBack)
@@ -425,7 +428,6 @@ namespace ELMAR.DevHtmlHelper.Controllers
                             if (detailReport != null)
                             {
                                 //Referecia pelo nome da classe 
-                                detailReport.ReportSource = XtraReport.FromFile(System.Configuration.ConfigurationManager.AppSettings["pathReports"].ToString() + "\\" + item.Key + ".repx", true);
                                 detailReport.ReportSource.DataSource = item.Value;
                             }
                         }

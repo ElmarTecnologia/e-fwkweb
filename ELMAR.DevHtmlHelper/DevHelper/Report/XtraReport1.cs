@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using DevExpress.XtraReports.UI;
 
 namespace DevHelper.Views.Reports {
-    public partial class XtraReport1 : DevExpress.XtraReports.UI.XtraReport {
+    public partial class XtraReport1 : XtraReport {
         public XtraReport1() {
             InitializeComponent();
         }
