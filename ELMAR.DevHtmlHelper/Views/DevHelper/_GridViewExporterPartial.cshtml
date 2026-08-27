@@ -5,7 +5,7 @@
     var jsScriptCSV = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'CSV', 'isCallBack': true });";
     var jsScriptTXT = ViewData["gridName"] + ".PerformCallback({ 'OutputFormat': 'TXT', 'isCallBack': true });";
 }
-<div class="ExportBox" style="float:right;font-size:12px;">
+<div class="ExportBox">
     <input type="button" name="OutputFormat1" value="PDF" onclick="javascript:@jsScriptPDF" title="Exportar PDF" />
     <input type="button" name="OutputFormat2" value="RTF" onclick="javascript:@jsScriptRTF" title="Exportar RTF" />
     <input type="button" name="OutputFormat3" value="XLS" onclick="javascript:@jsScriptXLS" title="Exportar XLS" />
