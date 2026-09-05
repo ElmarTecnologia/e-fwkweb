@@ -1685,9 +1685,6 @@
     <Content Include="Views\DevHelper\Usuario\SelecionarContexto.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Web.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Views\DevHelper\_LoadingPanelPartial.cshtml">
       <SubType>Code</SubType>
       <Generator>RazorGenerator</Generator>

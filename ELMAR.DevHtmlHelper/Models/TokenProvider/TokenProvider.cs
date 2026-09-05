@@ -11,8 +11,6 @@ namespace ELMAR.DevHtmlHelper.Models.TokenProvider
 {
     public class TokenProvider : OAuthAuthorizationServerProvider
     {
-        private readonly FwkContexto _contextoFwk = new FwkContexto();
-
         public override Task ValidateClientAuthentication
             (OAuthValidateClientAuthenticationContext context)
         {
