@@ -427,6 +427,7 @@ namespace ELMAR.DevHtmlHelper.Controllers
                             XRSubreport detailReport = report.FindControl("xrSubreport" + item.Key, true) != null ? report.FindControl("xrSubreport" + item.Key, true) as XRSubreport : report.FindControl(item.Key, true) as XRSubreport; //Acesso ao controle xrSubreport
                             if (detailReport != null)
                             {
+                                detailReport.ReportSource = detailReport.ReportSource ?? new XtraReport();
                                 //Referecia pelo nome da classe 
                                 detailReport.ReportSource.DataSource = item.Value;
                             }
